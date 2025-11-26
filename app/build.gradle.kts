@@ -33,6 +33,17 @@ android {
 }
 
 dependencies {
+    implementation("com.cloudinary:cloudinary-android:2.4.0") {
+        exclude(group = "com.facebook.fresco")
+    }
+    implementation("com.facebook.fresco:fresco:3.2.0")
+    implementation("com.facebook.fresco:imagepipeline:3.2.0")
+    implementation("com.facebook.fresco:imagepipeline-okhttp3:3.2.0")
+    implementation("com.facebook.fresco:animated-gif:3.2.0")
+    implementation("com.facebook.fresco:webpsupport:3.2.0")
+    implementation("com.facebook.fresco:animated-webp:3.2.0")
+
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

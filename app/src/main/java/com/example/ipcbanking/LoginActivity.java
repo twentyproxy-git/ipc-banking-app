@@ -33,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
+        CloudinaryHelper.initCloudinary(this);
+
         firebaseSeeder = new FirebaseSeeder(this);
         firebaseSeeder.seedUsers();
 
