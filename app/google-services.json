@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1014789083774",
+    "project_id": "ipc-baking-data",
+    "storage_bucket": "ipc-baking-data.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014789083774:android:bdd6bdd329199cb856fe2f",
+        "android_client_info": {
+          "package_name": "com.example.ipcbanking"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGpp9bYvn9hjsiQA2WnP18RI8xLT4_J3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
