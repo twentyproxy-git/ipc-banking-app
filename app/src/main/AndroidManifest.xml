@@ -16,9 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IPCBanking">
         <activity
-            android:name=".EditCustomerActivity"
+            android:name=".CustomerHomeActivity"
             android:exported="false" />
-        <!-- Login Activity -->
+        <activity
+            android:name=".EditCustomerActivity"
+            android:exported="false" /> <!-- Login Activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
