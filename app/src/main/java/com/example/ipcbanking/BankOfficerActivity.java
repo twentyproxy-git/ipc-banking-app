@@ -83,7 +83,7 @@ public class BankOfficerActivity extends AppCompatActivity {
         btnHomeLogout = findViewById(R.id.btn_home_logout);
 
         rvCustomers = findViewById(R.id.rv_recent_customers);
-        tvEmptyState = findViewById(R.id.tv_empty_state); // Text hiển thị khi list rỗng
+        tvEmptyState = findViewById(R.id.tv_empty_state);
     }
 
     private void setupRecyclerView() {
@@ -167,7 +167,6 @@ public class BankOfficerActivity extends AppCompatActivity {
     private void loadCustomersFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Lấy danh sách những user có role là CUSTOMER
         db.collection("users")
                 .whereEqualTo("role", "CUSTOMER")
                 .get()
@@ -179,12 +178,12 @@ public class BankOfficerActivity extends AppCompatActivity {
                             // Lưu ý: Class CustomerItem cần có constructor rỗng
                             CustomerItem item = doc.toObject(CustomerItem.class);
                             if (item != null) {
+                                item.setUid(doc.getId());
                                 fullList.add(item);
                             }
                         }
                     }
 
-                    // Cập nhật lên giao diện
                     adapter.updateList(fullList);
                     updateListVisibility(fullList);
                 })
@@ -194,7 +193,6 @@ public class BankOfficerActivity extends AppCompatActivity {
                 });
     }
 
-    // [MỚI] Hàm ẩn hiện List/Empty Text dựa trên dữ liệu
     private void updateListVisibility(List<CustomerItem> list) {
         if (list == null || list.isEmpty()) {
             rvCustomers.setVisibility(View.GONE);

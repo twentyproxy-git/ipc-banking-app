@@ -1,6 +1,8 @@
 package com.example.ipcbanking;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,5 +22,14 @@ public class CustomerHomeActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        Intent intent = getIntent();
+        String customerId = intent.getStringExtra("CUSTOMER_ID");
+
+        if (customerId != null) {
+            // Có ID rồi, giờ gọi hàm load thông tin user từ Firebase
+            // loadCustomerInfo(customerId);
+            Toast.makeText(this, "Logged in as: " + customerId, Toast.LENGTH_SHORT).show();
+        }
     }
 }
