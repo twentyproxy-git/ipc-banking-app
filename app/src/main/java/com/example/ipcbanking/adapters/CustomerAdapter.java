@@ -1,4 +1,4 @@
-package com.example.ipcbanking;
+package com.example.ipcbanking.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide; // Thư viện load ảnh
+import com.example.ipcbanking.R;
+import com.example.ipcbanking.models.CustomerItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +58,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerViewHolder> {
             Glide.with(context)
                     .load(customer.getAvatarUrl())
                     .placeholder(R.drawable.ic_topaz) // Ảnh chờ
-                    .error(R.drawable.ic_topaz)       // Ảnh lỗi
+                    .error(R.drawable.ic_unknown)       // Ảnh lỗi
                     .circleCrop()                     // Cắt tròn
                     .into(holder.imgAvatar);
         } else {

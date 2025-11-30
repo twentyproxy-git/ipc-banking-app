@@ -1,6 +1,7 @@
-package com.example.ipcbanking;
+package com.example.ipcbanking.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,21 +12,22 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.ipcbanking.utils.CloudinaryHelper;
+import com.example.ipcbanking.utils.FirebaseHelper;
+import com.example.ipcbanking.utils.FirebaseSeeder;
+import com.example.ipcbanking.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
-    // ... (Giữ nguyên các biến cũ)
+
     private final String emailPattern = "^[A-Za-z0-9._%+-]+@(ipc\\.com|gmail\\.com)$";
     private TextInputEditText emailEditText, passwordEditText;
     private MaterialButton loginButton;
     private FirebaseHelper firebaseHelper;
     private FirebaseSeeder firebaseSeeder;
-
-    // Thêm Firestore để lấy role
     private FirebaseFirestore db;
 
     @Override
@@ -39,14 +41,32 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Init Cloudinary & Seeder
+        // Init Cloudinary
         CloudinaryHelper.initCloudinary(this);
-        firebaseSeeder = new FirebaseSeeder(this);
-        firebaseSeeder.seedUsers();
 
+        // Init Helpers
         firebaseHelper = new FirebaseHelper(this);
-
         db = FirebaseFirestore.getInstance();
+        firebaseSeeder = new FirebaseSeeder(this);
+
+        SharedPreferences prefs = getSharedPreferences("AppConfig", MODE_PRIVATE);
+
+        boolean isSeeded = prefs.getBoolean("is_data_seeded_v2", false);
+
+        if (!isSeeded) {
+            Log.d("FirebaseSeeder", "🌱 First run (v2) detected. Seeding data...");
+            Toast.makeText(this, "Initializing sample data...", Toast.LENGTH_SHORT).show();
+
+            firebaseSeeder.seedUsers();
+
+            // Lưu lại trạng thái đã seed
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("is_data_seeded_v2", true);
+            editor.apply();
+        } else {
+            Log.d("FirebaseSeeder", "✅ Data already seeded. Skipping to protect data.");
+        }
+        // ------------------------------------------------------
 
         initViews();
 
@@ -78,21 +98,15 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (role != null) {
                             Intent intent;
-
                             if (role.equals("OFFICER")) {
                                 Toast.makeText(LoginActivity.this, "Welcome Bank Officer!", Toast.LENGTH_SHORT).show();
                                 intent = new Intent(LoginActivity.this, BankOfficerActivity.class);
-
                                 intent.putExtra("OFFICER_ID", uid);
-
                             } else {
                                 Toast.makeText(LoginActivity.this, "Welcome Customer!", Toast.LENGTH_SHORT).show();
                                 intent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
-
                                 intent.putExtra("CUSTOMER_ID", uid);
                             }
-
-                            // Xóa stack để không back lại login
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();

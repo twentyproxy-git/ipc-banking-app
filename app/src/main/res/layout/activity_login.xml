@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/border_screen"
-    tools:context=".LoginActivity">
+    tools:context=".activities.LoginActivity">
 
     <!-- App Title -->
     <TextView

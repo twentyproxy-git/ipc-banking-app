@@ -5,6 +5,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -16,13 +28,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IPCBanking">
         <activity
-            android:name=".CustomerHomeActivity"
+            android:name=".activities.WithdrawActivity"
             android:exported="false" />
         <activity
-            android:name=".EditCustomerActivity"
-            android:exported="false" /> <!-- Login Activity -->
+            android:name=".activities.DepositActivity"
+            android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.TransactionHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddCustomerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ReviewRequestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.VerifyKYCActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AccountDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.CustomerHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.EditCustomerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,8 +64,8 @@
             </intent-filter>
         </activity> <!-- Main Activity -->
         <activity
-            android:name=".BankOfficerActivity"
-            android:exported="true" />
+            android:name=".activities.BankOfficerActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

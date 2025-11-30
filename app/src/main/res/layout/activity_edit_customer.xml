@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    tools:context=".EditCustomerActivity">
+    tools:context=".activities.EditCustomerActivity">
 
+    <!-- Header Background -->
     <View
         android:id="@+id/view_header"
         android:layout_width="match_parent"
@@ -15,19 +16,35 @@
         android:background="@drawable/header_semi_circle"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Nút Back -->
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        android:src="@android:drawable/ic_menu_revert"
+        app:tint="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Tiêu đề -->
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="32dp"
         android:text="Customer Profile"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
+    <!-- Avatar -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_avatar"
         android:layout_width="100dp"
@@ -47,6 +64,7 @@
             android:src="@drawable/ic_topaz" />
     </androidx.cardview.widget.CardView>
 
+    <!-- Nội dung cuộn -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -60,6 +78,28 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="24dp">
+
+            <!-- [MỚI] Khu vực nút Camera/Upload (Ẩn mặc định, hiện khi Edit) -->
+            <LinearLayout
+                android:id="@+id/layout_avatar_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_gallery"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gallery"
+                    android:textColor="#590303"
+                    app:strokeColor="#590303"
+                    app:icon="@android:drawable/ic_menu_upload"
+                    app:iconTint="#590303"/>
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -129,7 +169,8 @@
                     <ImageView
                         android:layout_width="45dp"
                         android:layout_height="45dp"
-                        android:src="@drawable/ic_topaz_alert" />
+                        android:src="@drawable/ic_alert"
+                        app:tint="#D32F2F" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -161,6 +202,83 @@
                         android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="bottom"
+                    android:baselineAligned="false">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="110dp"
+                            android:layout_height="110dp"
+                            app:cardCornerRadius="8dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#F0F0F0"
+                            app:strokeColor="#BDBDBD"
+                            app:strokeWidth="1dp">
+                            <ImageView
+                                android:id="@+id/img_face_kyc"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="24dp"
+                                android:src="@drawable/ic_scan_face"
+                                android:scaleType="centerCrop"
+                                app:tint="#999999"/>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Face"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#333333"/>
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="16dp"
+                        android:layout_height="wrap_content"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"
+                            app:cardCornerRadius="8dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#F0F0F0"
+                            app:strokeColor="#BDBDBD"
+                            app:strokeWidth="1dp">
+                            <ImageView
+                                android:id="@+id/img_id_card"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="32dp"
+                                android:src="@drawable/ic_scan_face"
+                                android:scaleType="centerCrop"
+                                app:tint="#999999"/>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="ID Card (CCCD)"
+                            android:textSize="12sp"
+                            android:textColor="#757575"/>
+                    </LinearLayout>
+                </LinearLayout>
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -194,6 +312,7 @@
         </LinearLayout>
     </ScrollView>
 
+    <!-- Footer Buttons -->
     <LinearLayout
         android:id="@+id/layout_actions"
         android:layout_width="match_parent"

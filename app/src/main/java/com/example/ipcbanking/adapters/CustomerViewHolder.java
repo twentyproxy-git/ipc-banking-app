@@ -1,10 +1,12 @@
-package com.example.ipcbanking;
+package com.example.ipcbanking.adapters;
 
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.ipcbanking.R;
 
 public class CustomerViewHolder extends RecyclerView.ViewHolder {
 

@@ -1,0 +1,336 @@
+package com.example.ipcbanking.activities;
+
+import android.Manifest;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.example.ipcbanking.R;
+import com.example.ipcbanking.utils.CloudinaryHelper;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+public class VerifyKYCActivity extends AppCompatActivity {
+
+    private static final int PERMISSION_CODE = 100;
+
+    // View Components
+    private ImageView btnBack;
+    private View layoutUploadForm, layoutPendingState;
+    private Button btnBackHome, btnSubmit;
+    private TextInputEditText etIdCardNumber;
+
+    // Image Views
+    private ImageView imgIdDoc, imgFace;
+
+    // Floating Buttons
+    private View btnCamId, btnGalId;
+    private View btnCamFace, btnGalFace;
+
+    // Data
+    private FirebaseFirestore db;
+    private String customerId;
+    private Bitmap bitmapIdDoc = null;
+    private Bitmap bitmapFace = null;
+    private int currentCaptureTarget = 0; // 1: ID Card, 2: Face
+
+    // Launchers
+    private ActivityResultLauncher<Intent> cameraLauncher;
+    private ActivityResultLauncher<String> galleryLauncher;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_verify_kyc);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        // 1. Init Cloudinary
+        CloudinaryHelper.initCloudinary(this);
+
+        db = FirebaseFirestore.getInstance();
+        customerId = getIntent().getStringExtra("CUSTOMER_ID");
+
+        initViews();
+        setupResultLaunchers();
+        setupListeners();
+        checkCurrentKycStatus();
+    }
+
+    private void initViews() {
+        btnBack = findViewById(R.id.btn_back);
+        layoutUploadForm = findViewById(R.id.layout_upload_form);
+        layoutPendingState = findViewById(R.id.layout_pending_state);
+        btnBackHome = findViewById(R.id.btn_back_home);
+
+        etIdCardNumber = findViewById(R.id.et_id_card_number);
+        imgIdDoc = findViewById(R.id.img_id_doc);
+        imgFace = findViewById(R.id.img_face);
+
+        // Buttons
+        btnCamId = findViewById(R.id.btn_cam_id);
+        btnGalId = findViewById(R.id.btn_gal_id);
+        btnCamFace = findViewById(R.id.btn_cam_face);
+        btnGalFace = findViewById(R.id.btn_gal_face);
+
+        btnSubmit = findViewById(R.id.btn_submit_kyc);
+    }
+
+    // === CẤU HÌNH LAUNCHER ===
+    private void setupResultLaunchers() {
+        // Camera Launcher
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Bundle extras = result.getData().getExtras();
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+                        processCapturedImage(imageBitmap);
+                    }
+                }
+        );
+
+        // Gallery Launcher
+        galleryLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        try {
+                            InputStream imageStream = getContentResolver().openInputStream(uri);
+                            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                            processCapturedImage(selectedImage);
+                        } catch (Exception e) {
+                            Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+    }
+
+    private void processCapturedImage(Bitmap bitmap) {
+        if (currentCaptureTarget == 1) {
+            bitmapIdDoc = bitmap;
+            handleImageDisplay(imgIdDoc, bitmap);
+        } else if (currentCaptureTarget == 2) {
+            bitmapFace = bitmap;
+            handleImageDisplay(imgFace, bitmap);
+        }
+    }
+
+    private void handleImageDisplay(ImageView targetView, Bitmap bitmap) {
+        targetView.setImageBitmap(bitmap);
+        targetView.setPadding(0, 0, 0, 0);
+        targetView.setColorFilter(null);
+        targetView.setImageTintList(null);
+        targetView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    }
+
+    // === XỬ LÝ SỰ KIỆN CLICK CHO TỪNG NÚT ===
+    private void setupListeners() {
+        btnBack.setOnClickListener(v -> finish());
+        btnBackHome.setOnClickListener(v -> finish());
+
+        // ID Card - Camera
+        btnCamId.setOnClickListener(v -> {
+            currentCaptureTarget = 1;
+            checkPermissionAndOpenCamera();
+        });
+
+        // ID Card - Gallery
+        btnGalId.setOnClickListener(v -> {
+            currentCaptureTarget = 1;
+            checkPermissionAndOpenGallery();
+        });
+
+        // Face - Camera
+        btnCamFace.setOnClickListener(v -> {
+            currentCaptureTarget = 2;
+            checkPermissionAndOpenCamera();
+        });
+
+        // Face - Gallery
+        btnGalFace.setOnClickListener(v -> {
+            currentCaptureTarget = 2;
+            checkPermissionAndOpenGallery();
+        });
+
+        btnSubmit.setOnClickListener(v -> startUploadProcess());
+    }
+
+    // === PERMISSIONS & OPENING INTENTS ===
+    private void checkPermissionAndOpenCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CODE);
+        } else {
+            openCamera();
+        }
+    }
+
+    private void checkPermissionAndOpenGallery() {
+        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ?
+                Manifest.permission.READ_MEDIA_IMAGES : Manifest.permission.READ_EXTERNAL_STORAGE;
+
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, PERMISSION_CODE);
+        } else {
+            openGallery();
+        }
+    }
+
+    private void openCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            cameraLauncher.launch(takePictureIntent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No Camera App found on device", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openGallery() {
+        galleryLauncher.launch("image/*");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission Granted! Tap button again.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // === LOGIC UPLOAD & FIREBASE (Giữ nguyên) ===
+    private void checkCurrentKycStatus() {
+        if (customerId == null) return;
+        db.collection("users").document(customerId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String status = documentSnapshot.getString("kyc_status");
+                Map<String, Object> kycData = (Map<String, Object>) documentSnapshot.get("kyc_data");
+
+                if ("PENDING".equals(status)) {
+                    showPendingState();
+                } else {
+                    showUploadForm();
+                    if (kycData != null && kycData.containsKey("id_card_number")) {
+                        etIdCardNumber.setText((String) kycData.get("id_card_number"));
+                    }
+                    if ("VERIFIED".equals(status)) {
+                        btnSubmit.setText("Update & Re-verify");
+                    }
+                }
+            }
+        });
+    }
+
+    private void showPendingState() {
+        layoutUploadForm.setVisibility(View.GONE);
+        btnSubmit.setVisibility(View.GONE);
+        layoutPendingState.setVisibility(View.VISIBLE);
+    }
+
+    private void showUploadForm() {
+        layoutPendingState.setVisibility(View.GONE);
+        layoutUploadForm.setVisibility(View.VISIBLE);
+        btnSubmit.setVisibility(View.VISIBLE);
+    }
+
+    private void startUploadProcess() {
+        String idNumber = etIdCardNumber.getText().toString().trim();
+        if (idNumber.length() < 9) {
+            etIdCardNumber.setError("Invalid ID"); return;
+        }
+        if (bitmapIdDoc == null || bitmapFace == null) {
+            Toast.makeText(this, "Please provide both photos!", Toast.LENGTH_SHORT).show(); return;
+        }
+
+        btnSubmit.setEnabled(false);
+        btnSubmit.setText("Uploading (0/2)...");
+
+        byte[] idCardBytes = bitmapToBytes(bitmapIdDoc);
+        byte[] faceBytes = bitmapToBytes(bitmapFace);
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+
+        CloudinaryHelper.uploadImageBytes(idCardBytes, "id_" + customerId + "_" + timeStamp, new CloudinaryHelper.OnImageUploadListener() {
+            @Override
+            public void onSuccess(String idCardUrl) {
+                runOnUiThread(() -> btnSubmit.setText("Uploading (1/2)..."));
+                CloudinaryHelper.uploadImageBytes(faceBytes, "face_" + customerId + "_" + timeStamp, new CloudinaryHelper.OnImageUploadListener() {
+                    @Override
+                    public void onSuccess(String faceUrl) {
+                        saveToFirestore(idNumber, idCardUrl, faceUrl);
+                    }
+                    @Override public void onError(String error) { handleError("Face Upload Failed"); }
+                });
+            }
+            @Override public void onError(String error) { handleError("ID Upload Failed"); }
+        });
+    }
+
+    private byte[] bitmapToBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    private void saveToFirestore(String idNumber, String idCardUrl, String faceUrl) {
+        runOnUiThread(() -> btnSubmit.setText("Saving Data..."));
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("kyc_status", "PENDING");
+        Map<String, Object> kycData = new HashMap<>();
+        kycData.put("id_card_number", idNumber);
+        kycData.put("id_card_url", idCardUrl);
+        kycData.put("face_image_url", faceUrl);
+        updates.put("kyc_data", kycData);
+
+        db.collection("users").document(customerId).set(updates, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Submitted!", Toast.LENGTH_SHORT).show();
+                    showPendingState();
+                })
+                .addOnFailureListener(e -> handleError(e.getMessage()));
+    }
+
+    private void handleError(String msg) {
+        runOnUiThread(() -> {
+            btnSubmit.setEnabled(true);
+            btnSubmit.setText("Submit for Review");
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
+    }
+}

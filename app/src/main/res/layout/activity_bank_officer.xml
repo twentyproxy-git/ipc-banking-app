@@ -7,8 +7,9 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5"
     android:id="@+id/main"
-    tools:context=".BankOfficerActivity">
+    tools:context=".activities.BankOfficerActivity">
 
+    <!-- (Giữ nguyên phần Header như cũ) -->
     <View
         android:id="@+id/view_header_background"
         android:layout_width="match_parent"
@@ -16,7 +17,6 @@
         android:background="@drawable/header_semi_circle"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Title/Heading -->
     <TextView
         android:id="@+id/tv_welcome_title"
         android:layout_width="wrap_content"
@@ -30,7 +30,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Subheading (welcome)-->
     <TextView
         android:id="@+id/tv_officer_name"
         android:layout_width="wrap_content"
@@ -42,7 +41,6 @@
         app:layout_constraintStart_toStartOf="@id/tv_welcome_title"
         app:layout_constraintTop_toBottomOf="@id/tv_welcome_title" />
 
-    <!--Representative Character Icon -->
     <ImageView
         android:id="@+id/img_officer_avatar"
         android:layout_width="95dp"
@@ -54,12 +52,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_welcome_title" />
 
+    <!-- [SỬA LỖI] Đổi constraintBottom từ "parent" thành "@id/layout_bottom_bar" -->
+    <!-- Điều này giúp ScrollView không bị trôi xuống dưới thanh logout -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layout_bottom_bar"
         app:layout_constraintTop_toBottomOf="@id/tv_officer_name">
 
         <LinearLayout
@@ -68,7 +68,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Container of Customer Management  -->
+            <!-- (Giữ nguyên Card Customer Management) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -153,7 +153,6 @@
                         android:layout_marginTop="12dp"
                         android:visibility="gone"
                         android:gravity="center_vertical">
-                        <!-- Search Customer Bar -->
                         <EditText
                             android:id="@+id/et_search_query"
                             android:layout_width="0dp"
@@ -193,12 +192,10 @@
                         android:textColor="#757575"
                         android:layout_marginBottom="8dp"/>
 
-                    <!-- Help Views Stacking Up -->
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="175dp"
                         android:background="#FAFAFA">
-                        <!-- List of Customers  -->
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_recent_customers"
                             android:layout_width="match_parent"
@@ -221,7 +218,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Container of Pending eKYC  -->
+            <!-- (Giữ nguyên Card Pending eKYC) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_ekyc_queue"
                 android:layout_width="match_parent"
@@ -293,6 +290,8 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@android:color/black"/>
+
+                    <!-- 1. Savings Rate -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -313,8 +312,17 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Interest Rates"
-                                android:textStyle="bold"/>
+                                android:text="Savings Interest Rate"
+                                android:textStyle="bold"
+                                android:textColor="#333333"/>
+                            <TextView
+                                android:id="@+id/tv_current_rate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Current: Loading..."
+                                android:textColor="#4CAF50"
+                                android:textStyle="bold"
+                                android:textSize="14sp"/>
                         </LinearLayout>
                         <Button
                             android:id="@+id/btn_update_rates"
@@ -324,6 +332,55 @@
                             android:textColor="#590303"
                             style="@style/Widget.MaterialComponents.Button.TextButton"/>
                     </LinearLayout>
+
+                    <!-- Đường kẻ phân cách -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#EEEEEE"
+                        android:layout_marginVertical="8dp"/>
+
+                    <!-- 2. Mortgage Rate -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_bill"
+                            app:tint="#590303"/>
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mortgage Loan Rate"
+                                android:textStyle="bold"
+                                android:textColor="#333333"/>
+                            <TextView
+                                android:id="@+id/tv_current_mortgage_rate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Current: Loading..."
+                                android:textColor="#D32F2F"
+                                android:textStyle="bold"
+                                android:textSize="14sp"/>
+                        </LinearLayout>
+                        <Button
+                            android:id="@+id/btn_update_mortgage_rates"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Edit"
+                            android:textColor="#590303"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                    </LinearLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -363,7 +420,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="14dp"
-                android:src="@drawable/ic_home"
+                android:src="@drawable/ic_logout"
                 app:tint="#FFFFFF"/>
         </androidx.cardview.widget.CardView>
 

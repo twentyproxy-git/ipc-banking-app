@@ -2,4 +2,23 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="design_default_color_error">#D32F2F</color>
+
+    <color name="ipc_red">#590303</color>
+
+    <color name="green_success">#388E3C</color> <color name="orange_warning">#F57C00</color> <color name="gray_text">#757575</color>
+    <color name="gray_hint">#9E9E9E</color>
+    <color name="gray_border">#BDBDBD</color>
+    <color name="gray_bg_light">#F5F5F5</color>
+
+    <color name="colorPrimary">#590303</color>
+    <color name="colorPrimaryVariant">#3E0202</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorSecondary">#03DAC6</color>
+    <color name="colorOnSecondary">#000000</color>
+
+    <!-- Màu giao dịch -->
+    <color name="red_700">#D32F2F</color>     <!-- tiền gửi -->
+    <color name="green_700">#388E3C</color>   <!-- tiền nhận -->
 </resources>
