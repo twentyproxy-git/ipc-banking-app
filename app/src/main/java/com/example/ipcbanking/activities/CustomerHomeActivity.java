@@ -15,14 +15,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper; // [MỚI] Dùng LinearSnapHelper thay vì PagerSnapHelper
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.PagerSnapHelper; // [MỚI] Dùng PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
 import com.bumptech.glide.Glide;
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.adapters.AccountAdapter;
+import com.example.ipcbanking.adapters.PromotionAdapter;
 import com.example.ipcbanking.models.AccountItem;
+import com.example.ipcbanking.models.PromotionItem;
 import com.example.ipcbanking.utils.SpaceItemDecoration;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,17 +44,22 @@ public class CustomerHomeActivity extends AppCompatActivity {
     private CardView cardAvatarHeader, btnSupportChat;
     private View badgeKycAlert;
 
+    // Quick Actions
     private View btnTransfer, btnPayBill, btnVerifyKyc, btnDeposit, btnWithdraw;
 
+    // RecyclerViews
     private RecyclerView rvAccountsCarousel;
+    private RecyclerView rvPromotions;
+
     private BottomNavigationView bottomNavBar;
 
     // Firebase & Data
     private FirebaseFirestore db;
     private String customerId;
+
+    // Account Data
     private List<AccountItem> accountList = new ArrayList<>();
     private AccountAdapter accountAdapter;
-
     private AccountItem currentSelectedAccount = null;
 
     @Override
@@ -81,7 +89,8 @@ public class CustomerHomeActivity extends AppCompatActivity {
         }
 
         // Setup UI
-        setupRecyclerViewWithSnap();
+        setupAccountRecyclerView();
+        setupPromotionsCarousel();     // Setup Banner full width
         setupBottomNavigation();
         setupClickListeners();
 
@@ -102,6 +111,8 @@ public class CustomerHomeActivity extends AppCompatActivity {
         badgeKycAlert = findViewById(R.id.badge_kyc_alert);
 
         rvAccountsCarousel = findViewById(R.id.rv_accounts_carousel);
+        rvPromotions = findViewById(R.id.rv_promotions);
+
         bottomNavBar = findViewById(R.id.bottom_nav_bar);
 
         btnDeposit = findViewById(R.id.btn_deposit);
@@ -112,7 +123,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
         btnVerifyKyc = findViewById(R.id.btn_verify_kyc);
     }
 
-    private void setupRecyclerViewWithSnap() {
+    private void setupAccountRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         rvAccountsCarousel.setLayoutManager(layoutManager);
 
@@ -129,7 +140,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     View centerView = snapHelper.findSnapView(layoutManager);
                     if (centerView != null) {
@@ -143,6 +153,25 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
     }
 
+    // --- SETUP PROMOTIONS (FULL WIDTH) ---
+    private void setupPromotionsCarousel() {
+        LinearLayoutManager promoLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        rvPromotions.setLayoutManager(promoLayoutManager);
+
+        // Dummy Data (Chỉ dùng ảnh)
+        List<PromotionItem> promoList = new ArrayList<>();
+        promoList.add(new PromotionItem(R.drawable.ic_promotion_01));
+        promoList.add(new PromotionItem(R.drawable.ic_promotion_02));
+        promoList.add(new PromotionItem(R.drawable.ic_promotion_03));
+
+        PromotionAdapter promoAdapter = new PromotionAdapter(this, promoList);
+        rvPromotions.setAdapter(promoAdapter);
+
+        // QUAN TRỌNG: Dùng PagerSnapHelper để lướt từng ảnh một (không trôi tự do)
+        SnapHelper pagerSnapHelper = new PagerSnapHelper();
+        pagerSnapHelper.attachToRecyclerView(rvPromotions);
+    }
+
     private void setupBottomNavigation() {
         bottomNavBar.setItemIconTintList(null);
         bottomNavBar.setSelectedItemId(R.id.nav_home);
@@ -151,8 +180,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
                 return true;
-            }
-            else if (id == R.id.nav_history) {
+            } else if (id == R.id.nav_history) {
                 if (currentSelectedAccount != null) {
                     Intent intent = new Intent(CustomerHomeActivity.this, TransactionHistoryActivity.class);
                     intent.putExtra("ACCOUNT_NUMBER", currentSelectedAccount.getAccountNumber());
@@ -161,8 +189,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
                     Toast.makeText(this, "No account selected!", Toast.LENGTH_SHORT).show();
                 }
                 return true;
-            }
-            else if (id == R.id.nav_profile) {
+            } else if (id == R.id.nav_profile) {
                 openProfileActivity();
                 return true;
             }
@@ -171,7 +198,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        // 1. View Detail
         btnViewDetailAction.setOnClickListener(v -> {
             if (currentSelectedAccount != null) {
                 Intent intent = new Intent(CustomerHomeActivity.this, AccountDetailActivity.class);
@@ -182,7 +208,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
             }
         });
 
-        // 2. Các nút mở Profile
         cardAvatarHeader.setOnClickListener(v -> openProfileActivity());
         btnVerifyKyc.setOnClickListener(v -> {
             Intent intent = new Intent(CustomerHomeActivity.this, VerifyKYCActivity.class);
@@ -210,7 +235,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
             }
         });
 
-        // 3. Các nút khác (Demo)
         btnTransfer.setOnClickListener(v -> Toast.makeText(this, "Transfer Clicked", Toast.LENGTH_SHORT).show());
         btnPayBill.setOnClickListener(v -> Toast.makeText(this, "Pay Bill Clicked", Toast.LENGTH_SHORT).show());
         btnSupportChat.setOnClickListener(v -> Toast.makeText(this, "Support Agent Connecting...", Toast.LENGTH_SHORT).show());
@@ -234,7 +258,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
                             Glide.with(this).load(avatarUrl).into(imgAvatarHeader);
                         }
 
-                        // Logic hiện Badge đỏ
                         Boolean isKyced = documentSnapshot.getBoolean("is_kyced");
                         if (isKyced != null && isKyced) {
                             badgeKycAlert.setVisibility(View.GONE);
@@ -267,7 +290,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
                         rvAccountsCarousel.setVisibility(View.VISIBLE);
                         tvEmptyAccount.setVisibility(View.GONE);
                         btnViewDetailAction.setVisibility(View.VISIBLE);
-
                         accountAdapter.setData(accountList);
 
                         if (!accountList.isEmpty()) {
@@ -276,8 +298,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 
     @Override
     protected void onResume() {

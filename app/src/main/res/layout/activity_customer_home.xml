@@ -9,7 +9,6 @@
     android:background="#F5F5F5"
     tools:context=".activities.CustomerHomeActivity">
 
-    <!-- HEADER -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="match_parent"
@@ -67,7 +66,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- CONTENT SCROLL -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -79,13 +77,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="24dp">
-
-            <!-- BANNER & ACCOUNTS SECTION -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -162,7 +153,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- QUICK ACTIONS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -173,7 +163,6 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- Row 1: 4 icons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -181,7 +170,6 @@
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="12dp">
 
-                <!-- Transfer -->
                 <LinearLayout
                     android:id="@+id/btn_transfer"
                     android:layout_width="0dp"
@@ -212,7 +200,6 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Pay Bill -->
                 <LinearLayout
                     android:id="@+id/btn_pay_bill"
                     android:layout_width="0dp"
@@ -243,7 +230,6 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Deposit -->
                 <LinearLayout
                     android:id="@+id/btn_deposit"
                     android:layout_width="0dp"
@@ -274,7 +260,6 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Withdraw -->
                 <LinearLayout
                     android:id="@+id/btn_withdraw"
                     android:layout_width="0dp"
@@ -306,7 +291,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Row 2: 2 icons + 2 empty for spacing -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -314,7 +298,6 @@
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="12dp">
 
-                <!-- Verify ID (KYC) -->
                 <LinearLayout
                     android:id="@+id/btn_verify_kyc"
                     android:layout_width="0dp"
@@ -352,7 +335,6 @@
                             app:cardBackgroundColor="#D32F2F"
                             app:cardCornerRadius="9dp"
                             app:cardElevation="4dp">
-
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -363,9 +345,7 @@
                                 android:gravity="center"
                                 android:includeFontPadding="false"/>
                         </androidx.cardview.widget.CardView>
-
                     </FrameLayout>
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -375,27 +355,52 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Empty slots for spacing -->
                 <View
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
-
                 <View
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
-
                 <View
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
             </LinearLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:id="@+id/tv_promotions_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:text="Special Offers"
+                    android:textColor="#333333"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_promotions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintTop_toBottomOf="@id/tv_promotions_title"
+                    tools:listitem="@layout/item_promotion_banner" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BOTTOM NAV -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_bar"
         android:layout_width="match_parent"
@@ -406,7 +411,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/customer_bottom_menu" />
 
-    <!-- FLOATING AVATAR -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_avatar_header"
         android:layout_width="80dp"
