@@ -23,7 +23,7 @@ public class FirebaseSeeder {
     private final FirebaseFirestore db;
     private final List<UserSeedData> seedList = new ArrayList<>();
 
-    // [MỚI] Map để lưu UID tạm thời (Email -> UID) dùng cho việc tạo Transaction
+    // Map để lưu UID tạm thời (Email -> UID) dùng cho việc tạo Transaction
     private final Map<String, String> createdUserIds = new HashMap<>();
 
     public FirebaseSeeder(Context context) {
@@ -32,11 +32,16 @@ public class FirebaseSeeder {
     }
 
     public void seedUsers() {
+        // 1. Seed Bank Config (Lãi suất)
         seedBankConfig();
-        seedList.clear();
-        createdUserIds.clear(); // Reset map
 
-        // --- 1. OFFICERS DATA ---
+        // 2. Seed Bank Branches (Chi nhánh)
+        seedBankBranches();
+
+        seedList.clear();
+        createdUserIds.clear();
+
+        // --- OFFICERS DATA ---
         seedList.add(new UserSeedData("topaz@ipc.com", "topaz123", "Topaz Numby", "0901000111",
                 "Pier Point, Trụ sở IPC", "OFFICER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319532/qmr7tdydrnneiiflkxhb.png"));
@@ -49,7 +54,7 @@ public class FirebaseSeeder {
                 "Khách sạn Reverie, Penacony", "OFFICER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319526/eouerxvjagmdisvagc6d.png"));
 
-        // --- 2. CUSTOMERS DATA ---
+        // --- CUSTOMERS DATA ---
         seedList.add(new UserSeedData("kafka@gmail.com", "kafka123", "Kafka", "0909666777",
                 "Pteruges-V, Hầm trú ẩn Stellaron", "CUSTOMER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319508/rnbwc3kipbbtg4y7puhr.png"));
@@ -72,14 +77,40 @@ public class FirebaseSeeder {
 
         db.collection("bank_config").document("rates")
                 .set(config, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> Log.d("FirebaseSeeder", "✅ Bank Config Seeded"))
-                .addOnFailureListener(e -> Log.e("FirebaseSeeder", "❌ Bank Config Error: " + e.getMessage()));
+                .addOnSuccessListener(aVoid -> Log.d("FirebaseSeeder", "✅ Bank Config Seeded"));
+    }
+
+    private void seedBankBranches() {
+        Log.d("FirebaseSeeder", "📍 Seeding Bank Branches...");
+        List<Map<String, Object>> branches = new ArrayList<>();
+
+        // Tọa độ các điểm nổi tiếng ở TP.HCM
+        branches.add(createBranchMap("IPC Main HQ (Bitexco)", "2 Hai Trieu, Ben Nghe, Q1", 10.771661, 106.704372, "8:00 - 17:00"));
+        branches.add(createBranchMap("IPC Landmark 81", "720A Dien Bien Phu, Binh Thanh", 10.795005, 106.721846, "9:00 - 20:00"));
+        branches.add(createBranchMap("IPC Independence Palace", "135 Nam Ky Khoi Nghia, Q1", 10.776996, 106.695333, "8:00 - 16:00"));
+        branches.add(createBranchMap("IPC Ben Thanh Market", "Cho Ben Thanh, Le Loi, Q1", 10.772109, 106.698275, "8:00 - 18:00"));
+
+        for (int i = 0; i < branches.size(); i++) {
+            String docId = "branch_0" + (i + 1);
+            db.collection("bank_branches").document(docId)
+                    .set(branches.get(i), SetOptions.merge());
+        }
+        Log.d("FirebaseSeeder", "✅ Bank Branches Seeded.");
+    }
+
+    private Map<String, Object> createBranchMap(String name, String address, double lat, double lng, String hours) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("address", address);
+        map.put("latitude", lat);
+        map.put("longitude", lng);
+        map.put("opening_hours", hours);
+        return map;
     }
 
     private void processUserAtIndex(int index) {
         if (index >= seedList.size()) {
             Log.d("FirebaseSeeder", "✅ Users & Accounts Seeded. Starting Transactions...");
-            // [MỚI] Sau khi tạo xong user, chuyển sang tạo Transaction
             seedTransactions();
             return;
         }
@@ -95,7 +126,6 @@ public class FirebaseSeeder {
                 .addOnSuccessListener(authResult -> {
                     FirebaseUser user = authResult.getUser();
                     if (user != null) {
-                        Log.d("FirebaseSeeder", "✅ Created Auth: " + u.getEmail());
                         saveUserToFirestore(user.getUid(), u, onComplete);
                     } else {
                         onComplete.run();
@@ -103,7 +133,6 @@ public class FirebaseSeeder {
                 })
                 .addOnFailureListener(e -> {
                     if (e instanceof FirebaseAuthUserCollisionException) {
-                        Log.d("FirebaseSeeder", "⚠️ User exists, login to update: " + u.getEmail());
                         auth.signInWithEmailAndPassword(u.getEmail(), u.getPassword())
                                 .addOnSuccessListener(authResult -> {
                                     FirebaseUser user = authResult.getUser();
@@ -113,19 +142,14 @@ public class FirebaseSeeder {
                                         onComplete.run();
                                     }
                                 })
-                                .addOnFailureListener(e2 -> {
-                                    Log.e("FirebaseSeeder", "❌ Fatal Login Error: " + u.getEmail());
-                                    onComplete.run();
-                                });
+                                .addOnFailureListener(e2 -> onComplete.run());
                     } else {
-                        Log.e("FirebaseSeeder", "❌ Auth Error: " + e.getMessage());
                         onComplete.run();
                     }
                 });
     }
 
     private void saveUserToFirestore(String uid, UserSeedData u, Runnable onComplete) {
-        // [MỚI] Lưu UID vào map để dùng cho seedTransactions
         createdUserIds.put(u.getEmail(), uid);
 
         Map<String, Object> userData = new HashMap<>();
@@ -145,7 +169,6 @@ public class FirebaseSeeder {
         }
 
         Map<String, Object> kycDataMap = new HashMap<>();
-
         if (u.getRole().equals("OFFICER")) {
             userData.put("is_kyced", true);
             userData.put("kyc_status", "VERIFIED");
@@ -154,6 +177,7 @@ public class FirebaseSeeder {
             kycDataMap.put("id_card_url", "https://res.cloudinary.com/ipc-media/image/upload/v1/samples/id_card_sample");
             kycDataMap.put("verified_at", FieldValue.serverTimestamp());
         } else {
+            // KYC Customers
             boolean isVerified = false;
             String status = "UNVERIFIED";
             String idCardNum = null;
@@ -162,21 +186,16 @@ public class FirebaseSeeder {
             Object verifiedAt = null;
 
             if (u.getEmail().contains("kafka")) {
-                isVerified = true;
-                status = "VERIFIED";
-                idCardNum = "079199000001";
+                isVerified = true; status = "VERIFIED"; idCardNum = "079199000001";
                 faceUrl = "https://res.cloudinary.com/ipc-media/image/upload/v1764142585/nwawkaoucf9mq0n1rtcp.png";
                 idCardUrl = "https://res.cloudinary.com/ipc-media/image/upload/v1764318945/zuzey4lxwoeavdmrhlmo.png";
                 verifiedAt = FieldValue.serverTimestamp();
             } else if (u.getEmail().contains("firefly")) {
-                isVerified = true;
-                status = "VERIFIED";
-                idCardNum = "079199000002";
+                isVerified = true; status = "VERIFIED"; idCardNum = "079199000002";
                 faceUrl = "https://res.cloudinary.com/ipc-media/image/upload/v1764142600/rhufwnt3zyvtr7xtuzyq.png";
                 idCardUrl = "https://res.cloudinary.com/ipc-media/image/upload/v1764320933/hokhd098u0iicbivmti2.png";
                 verifiedAt = FieldValue.serverTimestamp();
             }
-
             userData.put("is_kyced", isVerified);
             userData.put("kyc_status", status);
             kycDataMap.put("id_card_number", idCardNum);
@@ -184,37 +203,23 @@ public class FirebaseSeeder {
             kycDataMap.put("id_card_url", idCardUrl);
             kycDataMap.put("verified_at", verifiedAt);
         }
-
         userData.put("kyc_data", kycDataMap);
 
         db.collection("users").document(uid)
                 .set(userData, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("FirebaseSeeder", "🔥 Firestore Saved: " + u.getEmail());
                     if (u.getRole().equals("CUSTOMER")) {
                         seedAccountsForCustomer(uid, u.getEmail());
                     }
                     onComplete.run();
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("FirebaseSeeder", "❌ Firestore Fail: " + u.getEmail());
-                    onComplete.run();
-                });
+                .addOnFailureListener(e -> onComplete.run());
     }
 
     private void seedAccountsForCustomer(String uid, String email) {
-        createAccount(uid, uid + "_CHECKING", "101" + uid.substring(0, 5).toUpperCase(),
-                "CHECKING", 50000000.0, 0, 0);
-
-        if (email.startsWith("kafka")) {
-            createAccount(uid, uid + "_SAVING", "202" + uid.substring(0, 5).toUpperCase(),
-                    "SAVING", 200000000.0, 5.5, 0);
-        }
-
-        if (email.startsWith("firefly")) {
-            createAccount(uid, uid + "_MORTGAGE", "303" + uid.substring(0, 5).toUpperCase(),
-                    "MORTGAGE", -1000000000.0, 7.5, 15000000.0);
-        }
+        createAccount(uid, uid + "_CHECKING", "101" + uid.substring(0, 5).toUpperCase(), "CHECKING", 50000000.0, 0, 0);
+        if (email.startsWith("kafka")) createAccount(uid, uid + "_SAVING", "202" + uid.substring(0, 5).toUpperCase(), "SAVING", 200000000.0, 5.5, 0);
+        if (email.startsWith("firefly")) createAccount(uid, uid + "_MORTGAGE", "303" + uid.substring(0, 5).toUpperCase(), "MORTGAGE", -1000000000.0, 7.5, 15000000.0);
     }
 
     private void createAccount(String ownerId, String docId, String accNum, String type, double balance, double rate, double monthlyPay) {
@@ -224,53 +229,32 @@ public class FirebaseSeeder {
         accData.put("account_type", type);
         accData.put("balance", balance);
         accData.put("created_at", FieldValue.serverTimestamp());
-
         if (type.equals("SAVING")) accData.put("profit_rate", rate);
-        if (type.equals("MORTGAGE")) {
-            accData.put("profit_rate", rate);
-            accData.put("monthly_payment", monthlyPay);
-        }
-
+        if (type.equals("MORTGAGE")) { accData.put("profit_rate", rate); accData.put("monthly_payment", monthlyPay); }
         db.collection("accounts").document(docId).set(accData, SetOptions.merge());
     }
 
-    // --- [MỚI] TẠO DỮ LIỆU GIAO DỊCH MẪU ---
     private void seedTransactions() {
         Log.d("FirebaseSeeder", "💸 Seeding Transactions...");
-
         String kafkaUid = createdUserIds.get("kafka@gmail.com");
         String swUid = createdUserIds.get("silverwolf@gmail.com");
         String fireflyUid = createdUserIds.get("firefly@gmail.com");
 
-        if (kafkaUid == null || swUid == null || fireflyUid == null) {
-            Log.e("FirebaseSeeder", "❌ Cannot seed transactions: Missing UIDs (Users might exist but not in this run)");
-            return;
-        }
+        if (kafkaUid == null || swUid == null || fireflyUid == null) return;
 
-        // Tái tạo lại số tài khoản dựa trên quy tắc cũ: "101" + 5 ký tự đầu UID
         String kafkaAcc = "101" + kafkaUid.substring(0, 5).toUpperCase();
         String swAcc = "101" + swUid.substring(0, 5).toUpperCase();
         String fireflyAcc = "101" + fireflyUid.substring(0, 5).toUpperCase();
 
         List<Map<String, Object>> transactions = new ArrayList<>();
-
-        // 1. Kafka -> Silver Wolf: Chuyển tiền chơi game
         transactions.add(createTransactionMap(kafkaUid, kafkaAcc, swAcc, "Silver Wolf", 500000, "Buy Stellaron Games", "INTERNAL"));
-
-        // 2. Silver Wolf -> Kafka: Trả tiền ăn tối
         transactions.add(createTransactionMap(swUid, swAcc, kafkaAcc, "Kafka", 150000, "Pay back dinner", "INTERNAL"));
-
-        // 3. Firefly -> Kafka: Quỹ hoạt động Glamoth
         transactions.add(createTransactionMap(fireflyUid, fireflyAcc, kafkaAcc, "Kafka", 2000000, "Glamoth budget", "INTERNAL"));
-
-        // 4. Kafka -> Firefly: Tiền cafe
         transactions.add(createTransactionMap(kafkaUid, kafkaAcc, fireflyAcc, "Firefly", 300000, "Coffee money", "INTERNAL"));
 
-        // Lưu tất cả giao dịch
         for (Map<String, Object> trans : transactions) {
             db.collection("transactions").add(trans);
         }
-
         Log.d("FirebaseSeeder", "🎉 DONE! All transactions seeded.");
     }
 

@@ -68,7 +68,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_home);
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
@@ -221,6 +220,10 @@ public class CustomerHomeActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_profile) {
                 openProfileActivity();
+                return true;
+            } else if (id == R.id.nav_map) {
+                Intent intent = new Intent(CustomerHomeActivity.this, MapActivity.class);
+                startActivity(intent);
                 return true;
             }
             return false;
