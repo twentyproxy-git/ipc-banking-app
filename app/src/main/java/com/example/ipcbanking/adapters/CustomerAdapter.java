@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide; // Thư viện load ảnh
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.CustomerItem;
+import com.example.ipcbanking.viewholders.CustomerViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

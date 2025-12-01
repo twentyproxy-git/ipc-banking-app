@@ -2,6 +2,7 @@ package com.example.ipcbanking.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,7 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
-import androidx.recyclerview.widget.PagerSnapHelper; // [MỚI] Dùng PagerSnapHelper
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
@@ -89,8 +90,8 @@ public class CustomerHomeActivity extends AppCompatActivity {
         }
 
         // Setup UI
-        setupAccountRecyclerView();
-        setupPromotionsCarousel();     // Setup Banner full width
+        setupAccountRecyclerView(); // Setup Account Recycler View and Adapter
+        setupPromotionsCarousel(); // Setup Promotion Recycler View and Adapter
         setupBottomNavigation();
         setupClickListeners();
 
@@ -155,10 +156,10 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
     // --- SETUP PROMOTIONS (FULL WIDTH) ---
     private void setupPromotionsCarousel() {
-        LinearLayoutManager promoLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager promoLayoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         rvPromotions.setLayoutManager(promoLayoutManager);
 
-        // Dummy Data (Chỉ dùng ảnh)
         List<PromotionItem> promoList = new ArrayList<>();
         promoList.add(new PromotionItem(R.drawable.ic_promotion_01));
         promoList.add(new PromotionItem(R.drawable.ic_promotion_02));
@@ -167,10 +168,39 @@ public class CustomerHomeActivity extends AppCompatActivity {
         PromotionAdapter promoAdapter = new PromotionAdapter(this, promoList);
         rvPromotions.setAdapter(promoAdapter);
 
-        // QUAN TRỌNG: Dùng PagerSnapHelper để lướt từng ảnh một (không trôi tự do)
+        // Sử dụng PagerSnapHelper để cuộn từng item một
         SnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(rvPromotions);
+
+        // ----------------------------
+        //  AUTO SCROLL
+        // ----------------------------
+        final int interval = 5000; // 5 giây
+        final Handler handler = new Handler();
+
+        Runnable autoScrollRunnable = new Runnable() {
+            int currentIndex = 0;
+
+            @Override
+            public void run() {
+                if (promoList.size() == 0) return;
+
+                currentIndex++;
+                if (currentIndex >= promoList.size()) {
+                    currentIndex = 0;
+                }
+
+                rvPromotions.smoothScrollToPosition(currentIndex);
+                handler.postDelayed(this, interval);
+            }
+        };
+
+        handler.postDelayed(autoScrollRunnable, interval);
+
+        rvPromotions.setTag(R.id.autoscroll_handler, handler);
+        rvPromotions.setTag(R.id.autoscroll_runnable, autoScrollRunnable);
     }
+
 
     private void setupBottomNavigation() {
         bottomNavBar.setItemIconTintList(null);
@@ -305,6 +335,18 @@ public class CustomerHomeActivity extends AppCompatActivity {
         if (customerId != null) {
             loadUserProfile(customerId);
             loadUserAccounts(customerId);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Handler handler = (Handler) rvPromotions.getTag(R.id.autoscroll_handler);
+        Runnable runnable = (Runnable) rvPromotions.getTag(R.id.autoscroll_runnable);
+
+        if (handler != null && runnable != null) {
+            handler.removeCallbacks(runnable);
         }
     }
 }

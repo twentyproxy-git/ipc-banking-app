@@ -4,37 +4,32 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
+import com.example.ipcbanking.viewholders.AccountViewHolder;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountViewHolder> {
+public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
 
     private Context context;
     private List<AccountItem> accountList;
-    private boolean isBalanceVisible = true; // Trạng thái ẩn/hiện số dư
+    private boolean isBalanceVisible = true;
 
     public AccountAdapter(Context context, List<AccountItem> accountList) {
         this.context = context;
-        // Khởi tạo list an toàn để tránh null
         this.accountList = (accountList != null) ? accountList : new ArrayList<>();
     }
 
-    // Hàm cập nhật dữ liệu mới
     public void setData(List<AccountItem> newList) {
         this.accountList = (newList != null) ? newList : new ArrayList<>();
-        notifyDataSetChanged(); // Báo cho RecyclerView vẽ lại
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -49,45 +44,44 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
         AccountItem item = accountList.get(position);
         if (item == null) return;
 
-        // 1. [CẬP NHẬT] Định dạng tiền tệ thủ công để hiện chữ "đ"
-        DecimalFormat decimalFormat = new DecimalFormat("#,###");
-        String balanceStr = decimalFormat.format(item.getBalance()) + " VND";
+        DecimalFormat df = new DecimalFormat("#,###");
+        String balanceStr = df.format(item.getBalance()) + " VND";
 
-        // 2. Xử lý Logic Ẩn/Hiện Số dư
+        // ====== ẨN/HIỆN SỐ DƯ ======
         if (isBalanceVisible) {
             holder.tvBalance.setText(balanceStr);
-            holder.imgVisibility.setImageResource(R.drawable.ic_eye); // Icon mở mắt
+            holder.imgVisibility.setImageResource(R.drawable.ic_eye);
         } else {
-            // [CẬP NHẬT] Đổi hiển thị khi ẩn
             holder.tvBalance.setText("****** VND");
-            holder.imgVisibility.setImageResource(R.drawable.ic_eye_off); // Icon nhắm mắt
+            holder.imgVisibility.setImageResource(R.drawable.ic_eye_off);
         }
 
-        // Sự kiện click vào con mắt
         holder.imgVisibility.setOnClickListener(v -> {
             isBalanceVisible = !isBalanceVisible;
-            notifyDataSetChanged(); // Load lại toàn bộ list để áp dụng cho tất cả thẻ
+            notifyDataSetChanged();
         });
 
-        String rawNum = item.getAccountNumber();
-        if (rawNum != null && rawNum.length() > 4) {
-            String last4 = rawNum.substring(rawNum.length() - 4);
-            holder.tvAccountNumber.setText("**** **** **** " + last4);
+        // ====== FORMAT ACCOUNT NUMBER ======
+        String num = item.getAccountNumber();
+        if (num != null && num.length() > 4) {
+            holder.tvAccountNumber.setText("**** **** **** " + num.substring(num.length() - 4));
         } else {
-            holder.tvAccountNumber.setText(rawNum != null ? rawNum : "N/A");
+            holder.tvAccountNumber.setText(num != null ? num : "N/A");
         }
 
-        // 4. Loại thẻ & Thông tin phụ
+        // ====== LOẠI TÀI KHOẢN ======
         String type = item.getAccountType();
-        String displayType = "Payment Account";
+        String displayType;
 
-        if ("SAVING".equals(type)) {
-            displayType = "Savings Account (" + item.getProfitRate() + "%)";
-        } else if ("MORTGAGE".equals(type)) {
-            String monthlyPay = decimalFormat.format(item.getMonthlyPayment()) + " VND";
-            displayType = "Mortgage Loan (Pay: " + monthlyPay + ")";
-        } else {
-            displayType = "Checking / Payment Account";
+        switch (type) {
+            case "SAVING":
+                displayType = "Savings Account (" + item.getProfitRate() + "%)";
+                break;
+            case "MORTGAGE":
+                displayType = "Mortgage Loan (Pay: " + df.format(item.getMonthlyPayment()) + " VND)";
+                break;
+            default:
+                displayType = "Checking / Payment Account";
         }
 
         holder.tvCardType.setText(displayType);
@@ -97,24 +91,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 
     @Override
     public int getItemCount() {
-        return accountList != null ? accountList.size() : 0;
-    }
-
-    // === VIEWHOLDER ===
-    public static class AccountViewHolder extends RecyclerView.ViewHolder {
-
-        TextView tvBankName, tvCardType, tvBalance, tvAccountNumber;
-        ImageView imgVisibility, imgChip;
-
-        public AccountViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            tvBankName = itemView.findViewById(R.id.tv_bank_name);
-            tvCardType = itemView.findViewById(R.id.tv_card_type);
-            tvBalance = itemView.findViewById(R.id.tv_balance);
-            tvAccountNumber = itemView.findViewById(R.id.tv_account_number);
-            imgVisibility = itemView.findViewById(R.id.img_visibility);
-            imgChip = itemView.findViewById(R.id.img_chip);
-        }
+        return (accountList != null) ? accountList.size() : 0;
     }
 }

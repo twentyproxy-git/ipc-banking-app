@@ -1,4 +1,4 @@
-package com.example.ipcbanking.adapters;
+package com.example.ipcbanking.viewholders;
 
 import android.view.View;
 import android.widget.ImageView;

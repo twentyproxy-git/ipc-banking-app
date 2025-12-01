@@ -4,14 +4,17 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.PromotionItem;
+import com.example.ipcbanking.viewholders.PromotionViewHolder;
+
 import java.util.List;
 
-public class PromotionAdapter extends RecyclerView.Adapter<PromotionAdapter.PromotionViewHolder> {
+public class PromotionAdapter extends RecyclerView.Adapter<PromotionViewHolder> {
 
     private Context context;
     private List<PromotionItem> promotionList;
@@ -36,15 +39,6 @@ public class PromotionAdapter extends RecyclerView.Adapter<PromotionAdapter.Prom
 
     @Override
     public int getItemCount() {
-        return promotionList.size();
-    }
-
-    public static class PromotionViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgBanner;
-
-        public PromotionViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imgBanner = itemView.findViewById(R.id.img_promo_banner);
-        }
+        return promotionList != null ? promotionList.size() : 0;
     }
 }
