@@ -12,6 +12,7 @@ import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.TransactionItem;
 import com.example.ipcbanking.viewholders.TransactionViewHolder;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
     private List<TransactionItem> list;
     private String currentAccountNumber;
     private Map<String, String> accountNameMap;
+
+    private final NumberFormat vndFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+
 
     private final SimpleDateFormat sdf =
             new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
@@ -53,6 +57,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         TransactionItem item = list.get(position);
 
+        if (item.getType() != null) {
+            holder.tvType.setText(item.getType().toUpperCase(Locale.getDefault()));
+        } else {
+            holder.tvType.setText("UNKNOWN");
+        }
+
         String senderName = accountNameMap != null
                 ? accountNameMap.getOrDefault(item.getSenderAccount(), item.getSenderAccount())
                 : item.getSenderAccount();
@@ -71,11 +81,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionViewHold
         double amount = item.getAmount();
         boolean isSent = currentAccountNumber.equals(item.getSenderAccount());
 
-        holder.tvAmount.setText(
-                (isSent ? "- " : "+ ")
-                        + String.format(Locale.getDefault(), "%.2f", amount)
-                        + " VND"
-        );
+        // Format số tiền kiểu 100.000 VND
+        String formattedAmount = vndFormat.format(amount) + " VND";
+
+        holder.tvAmount.setText(isSent ? "- " + formattedAmount : "+ " + formattedAmount);
 
         holder.tvAmount.setTextColor(
                 context.getResources().getColor(

@@ -23,18 +23,23 @@ import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
 import com.example.ipcbanking.models.TransactionItem;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class WithdrawActivity extends AppCompatActivity {
 
@@ -52,7 +57,9 @@ public class WithdrawActivity extends AppCompatActivity {
     private String customerId;
     private List<AccountItem> accountList = new ArrayList<>();
     private AccountItem currentAccount;
-    private String selectedDestination = "ATM/Cash"; // Đích mặc định
+    private String selectedDestination = "ATM/Cash";
+    private String fullName = "Me";  // fallback nếu chưa fetch xong
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,18 @@ public class WithdrawActivity extends AppCompatActivity {
         });
 
         db = FirebaseFirestore.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (firebaseUser != null) {
+            db.collection("users")
+                    .document(firebaseUser.getUid())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()) {
+                            fullName = doc.getString("full_name");
+                        }
+                    });
+        }
 
         // Nhận CustomerID
         if (getIntent().hasExtra("CUSTOMER_ID")) {
@@ -232,27 +251,45 @@ public class WithdrawActivity extends AppCompatActivity {
     }
 
     private void saveTransactionHistory(double amount) {
-        TransactionItem trans = new TransactionItem(
-                currentAccount.getAccountNumber(),
-                currentAccount.getAccountNumber(),
-                "SYSTEM_WITHDRAW",
-                selectedDestination,
-                amount,
-                "Withdraw to " + selectedDestination,
-                "WITHDRAWAL",
-                "SUCCESS",
-                new Date()
-        );
+        Map<String, Object> transactionData = new HashMap<>();
 
-        db.collection("transactions").add(trans)
+        // Chuẩn hoá lại tên ngân hàng cho đúng format database
+        String bankName;
+        if (selectedDestination.equalsIgnoreCase("MOMO Wallet")) {
+            bankName = "MoMo";
+        } else if (selectedDestination.equalsIgnoreCase("MB Bank")) {
+            bankName = "MB Bank";
+        } else {
+            bankName = "Vietcombank";
+        }
+
+        transactionData.put("type", "WITHDRAW");
+
+        // BÊN GỬI → User Account
+        transactionData.put("sender_account", currentAccount.getAccountNumber());
+        transactionData.put("sender_name", fullName);
+
+        // BÊN NHẬN → EXTERNAL
+        transactionData.put("receiver_account", "EXTERNAL");
+        transactionData.put("receiver_name", bankName + " (" + fullName + ")");
+
+        transactionData.put("counterparty_bank", bankName);
+
+        transactionData.put("amount", amount);
+        transactionData.put("message", "Withdraw to " + bankName);
+        transactionData.put("status", "SUCCESS");
+        transactionData.put("created_at", FieldValue.serverTimestamp());
+
+        db.collection("transactions")
+                .add(transactionData)
                 .addOnSuccessListener(doc -> {
                     loadingOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "Withdraw Successful!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Withdraw successful!", Toast.LENGTH_SHORT).show();
                     etAmount.setText("");
                 })
                 .addOnFailureListener(e -> {
                     loadingOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "Withdraw Successful (History Error)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Withdraw success but history save failed!", Toast.LENGTH_SHORT).show();
                 });
     }
 

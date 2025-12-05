@@ -5,7 +5,7 @@ public class UserSeedData {
     private String password;
     private String fullName;
     private String phoneNumber;
-    private String address; // [MỚI] Thêm địa chỉ
+    private String address;
     private String role;
     private String avatarUrl;
 

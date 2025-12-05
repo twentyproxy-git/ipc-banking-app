@@ -2,7 +2,6 @@ package com.example.ipcbanking.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,7 +16,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
-import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
@@ -29,6 +27,7 @@ import com.example.ipcbanking.models.AccountItem;
 import com.example.ipcbanking.models.PromotionItem;
 import com.example.ipcbanking.utils.SpaceItemDecoration;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -42,43 +41,42 @@ public class CustomerHomeActivity extends AppCompatActivity {
     private TextView btnViewDetailAction;
     private ImageView imgAvatarHeader;
 
-    private CardView cardAvatarHeader, btnSupportChat;
+    private CardView cardAvatarHeader, btnLogout;
     private View badgeKycAlert;
 
-    // Quick Actions
-    private View btnTransfer, btnPayBill, btnVerifyKyc, btnDeposit, btnWithdraw;
+    private View btnTransfer, btnPayBill, btnFlight, btnTicket, btnDeposit, btnWithdraw, btnVerifyKyc;
 
-    // RecyclerViews
+    // Accounts
     private RecyclerView rvAccountsCarousel;
-    private RecyclerView rvPromotions;
-
-    private BottomNavigationView bottomNavBar;
-
-    // Firebase & Data
-    private FirebaseFirestore db;
-    private String customerId;
-
-    // Account Data
+    private SnapHelper snapHelper;
     private List<AccountItem> accountList = new ArrayList<>();
     private AccountAdapter accountAdapter;
     private AccountItem currentSelectedAccount = null;
+
+    // Promotions
+    private RecyclerView rvPromotions;
+    private PromotionAdapter promotionAdapter;
+    private List<PromotionItem> promotionList = new ArrayList<>();
+
+    private BottomNavigationView bottomNavBar;
+    private FirebaseFirestore db;
+    private String customerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_home);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
-        // Init Firebase
         db = FirebaseFirestore.getInstance();
         initViews();
 
-        // Get ID
         Intent intent = getIntent();
         customerId = intent.getStringExtra("CUSTOMER_ID");
 
@@ -88,13 +86,11 @@ public class CustomerHomeActivity extends AppCompatActivity {
             return;
         }
 
-        // Setup UI
-        setupAccountRecyclerView(); // Setup Account Recycler View and Adapter
-        setupPromotionsCarousel(); // Setup Promotion Recycler View and Adapter
+        setupRecyclerViewWithSnap(); // Accounts
+        setupPromotionsRecyclerView(); // Promotions
         setupBottomNavigation();
         setupClickListeners();
 
-        // Load Data
         loadUserProfile(customerId);
         loadUserAccounts(customerId);
     }
@@ -106,7 +102,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         imgAvatarHeader = findViewById(R.id.img_avatar_header);
         cardAvatarHeader = findViewById(R.id.card_avatar_header);
-        btnSupportChat = findViewById(R.id.btn_support_chat);
+        btnLogout = findViewById(R.id.btn_logout);
 
         badgeKycAlert = findViewById(R.id.badge_kyc_alert);
 
@@ -115,15 +111,16 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         bottomNavBar = findViewById(R.id.bottom_nav_bar);
 
-        btnDeposit = findViewById(R.id.btn_deposit);
-        btnWithdraw = findViewById(R.id.btn_withdraw);
-
         btnTransfer = findViewById(R.id.btn_transfer);
         btnPayBill = findViewById(R.id.btn_pay_bill);
+        btnFlight = findViewById(R.id.btn_flight);
+        btnTicket = findViewById(R.id.btn_ticket);
+        btnDeposit = findViewById(R.id.btn_deposit);
+        btnWithdraw = findViewById(R.id.btn_withdraw);
         btnVerifyKyc = findViewById(R.id.btn_verify_kyc);
     }
 
-    private void setupAccountRecyclerView() {
+    private void setupRecyclerViewWithSnap() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         rvAccountsCarousel.setLayoutManager(layoutManager);
 
@@ -133,7 +130,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
         accountAdapter = new AccountAdapter(this, accountList);
         rvAccountsCarousel.setAdapter(accountAdapter);
 
-        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(rvAccountsCarousel);
 
         rvAccountsCarousel.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -153,77 +150,47 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
     }
 
-    // --- SETUP PROMOTIONS (FULL WIDTH) ---
-    private void setupPromotionsCarousel() {
-        LinearLayoutManager promoLayoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        rvPromotions.setLayoutManager(promoLayoutManager);
+    private void setupPromotionsRecyclerView() {
+        rvPromotions.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        List<PromotionItem> promoList = new ArrayList<>();
-        promoList.add(new PromotionItem(R.drawable.ic_promotion_01));
-        promoList.add(new PromotionItem(R.drawable.ic_promotion_02));
-        promoList.add(new PromotionItem(R.drawable.ic_promotion_03));
+        promotionList.clear();
+        promotionList.add(new PromotionItem(R.drawable.ic_promotion_05));
+        promotionList.add(new PromotionItem(R.drawable.ic_promotion_04));
+        promotionList.add(new PromotionItem(R.drawable.ic_promotion_03));
 
-        PromotionAdapter promoAdapter = new PromotionAdapter(this, promoList);
-        rvPromotions.setAdapter(promoAdapter);
+        promotionAdapter = new PromotionAdapter(this, promotionList);
+        rvPromotions.setAdapter(promotionAdapter);
 
-        // Sử dụng PagerSnapHelper để cuộn từng item một
-        SnapHelper pagerSnapHelper = new PagerSnapHelper();
-        pagerSnapHelper.attachToRecyclerView(rvPromotions);
-
-        // ----------------------------
-        //  AUTO SCROLL
-        // ----------------------------
-        final int interval = 5000; // 5 giây
-        final Handler handler = new Handler();
-
-        Runnable autoScrollRunnable = new Runnable() {
-            int currentIndex = 0;
-
-            @Override
-            public void run() {
-                if (promoList.size() == 0) return;
-
-                currentIndex++;
-                if (currentIndex >= promoList.size()) {
-                    currentIndex = 0;
-                }
-
-                rvPromotions.smoothScrollToPosition(currentIndex);
-                handler.postDelayed(this, interval);
-            }
-        };
-
-        handler.postDelayed(autoScrollRunnable, interval);
-
-        rvPromotions.setTag(R.id.autoscroll_handler, handler);
-        rvPromotions.setTag(R.id.autoscroll_runnable, autoScrollRunnable);
+        SnapHelper promoSnapHelper = new LinearSnapHelper();
+        promoSnapHelper.attachToRecyclerView(rvPromotions);
     }
-
 
     private void setupBottomNavigation() {
         bottomNavBar.setItemIconTintList(null);
-        bottomNavBar.setSelectedItemId(R.id.nav_home);
 
         bottomNavBar.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                return true;
-            } else if (id == R.id.nav_history) {
+
+            if (id == R.id.nav_history) {
                 if (currentSelectedAccount != null) {
                     Intent intent = new Intent(CustomerHomeActivity.this, TransactionHistoryActivity.class);
                     intent.putExtra("ACCOUNT_NUMBER", currentSelectedAccount.getAccountNumber());
                     startActivity(intent);
                 } else {
-                    Toast.makeText(this, "No account selected!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please select an account first!", Toast.LENGTH_SHORT).show();
                 }
-                return true;
-            } else if (id == R.id.nav_profile) {
+                return false;
+            }
+            else if (id == R.id.nav_map) {
+                startActivity(new Intent(CustomerHomeActivity.this, MapActivity.class));
+                return false;
+            }
+            else if (id == R.id.nav_profile) {
                 openProfileActivity();
-                return true;
-            } else if (id == R.id.nav_map) {
-                Intent intent = new Intent(CustomerHomeActivity.this, MapActivity.class);
-                startActivity(intent);
+                return false;
+            }
+            else if (id == R.id.nav_support) {
+                Toast.makeText(this, "Connecting to Support Agent...", Toast.LENGTH_SHORT).show();
                 return true;
             }
             return false;
@@ -231,6 +198,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
+        // Detail & Profile
         btnViewDetailAction.setOnClickListener(v -> {
             if (currentSelectedAccount != null) {
                 Intent intent = new Intent(CustomerHomeActivity.this, AccountDetailActivity.class);
@@ -240,37 +208,64 @@ public class CustomerHomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "No account selected!", Toast.LENGTH_SHORT).show();
             }
         });
-
         cardAvatarHeader.setOnClickListener(v -> openProfileActivity());
+
+        // Quick Actions
+        btnTransfer.setOnClickListener(v -> {
+//            if (currentSelectedAccount != null) {
+//                Intent intent = new Intent(CustomerHomeActivity.this, TransferActivity.class);
+//                intent.putExtra("SOURCE_ACCOUNT", currentSelectedAccount);
+//                startActivity(intent);
+//            } else {
+//                Toast.makeText(this, "Please select an account first", Toast.LENGTH_SHORT).show();
+//            }
+        });
+
+        btnPayBill.setOnClickListener(v ->
+                Toast.makeText(this, "Pay Bill feature coming soon!", Toast.LENGTH_SHORT).show()
+        );
+
+        btnFlight.setOnClickListener(v ->
+                Toast.makeText(this, "Flight Booking feature coming soon!", Toast.LENGTH_SHORT).show()
+        );
+
+        btnTicket.setOnClickListener(v ->
+                Toast.makeText(this, "Ticket Booking feature coming soon!", Toast.LENGTH_SHORT).show()
+        );
+
+        btnDeposit.setOnClickListener(v -> {
+            Intent intent = new Intent(CustomerHomeActivity.this, DepositActivity.class);
+            intent.putExtra("CUSTOMER_ID", customerId);
+            startActivity(intent);
+        });
+
+        btnWithdraw.setOnClickListener(v -> {
+            Intent intent = new Intent(CustomerHomeActivity.this, WithdrawActivity.class);
+            intent.putExtra("CUSTOMER_ID", customerId);
+            startActivity(intent);
+        });
+
         btnVerifyKyc.setOnClickListener(v -> {
             Intent intent = new Intent(CustomerHomeActivity.this, VerifyKYCActivity.class);
             intent.putExtra("CUSTOMER_ID", customerId);
             startActivity(intent);
         });
 
-        btnDeposit.setOnClickListener(v -> {
-            if (currentSelectedAccount != null) {
-                Intent intent = new Intent(CustomerHomeActivity.this, DepositActivity.class);
-                intent.putExtra("CUSTOMER_ID", customerId);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Please select an account first", Toast.LENGTH_SHORT).show();
-            }
+        btnLogout.setOnClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Logout")
+                    .setMessage("Do you really want to log out?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        FirebaseAuth.getInstance().signOut();
+                        Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(CustomerHomeActivity.this, LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .show();
         });
-
-        btnWithdraw.setOnClickListener(v -> {
-            if (currentSelectedAccount != null) {
-                Intent intent = new Intent(CustomerHomeActivity.this, WithdrawActivity.class);
-                intent.putExtra("ACCOUNT_DATA", currentSelectedAccount);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Please select an account first", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnTransfer.setOnClickListener(v -> Toast.makeText(this, "Transfer Clicked", Toast.LENGTH_SHORT).show());
-        btnPayBill.setOnClickListener(v -> Toast.makeText(this, "Pay Bill Clicked", Toast.LENGTH_SHORT).show());
-        btnSupportChat.setOnClickListener(v -> Toast.makeText(this, "Support Agent Connecting...", Toast.LENGTH_SHORT).show());
     }
 
     private void openProfileActivity() {
@@ -308,9 +303,9 @@ public class CustomerHomeActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     accountList.clear();
-
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         AccountItem account = doc.toObject(AccountItem.class);
+                        account.setId(doc.getId());
                         accountList.add(account);
                     }
 
@@ -323,6 +318,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
                         rvAccountsCarousel.setVisibility(View.VISIBLE);
                         tvEmptyAccount.setVisibility(View.GONE);
                         btnViewDetailAction.setVisibility(View.VISIBLE);
+
                         accountAdapter.setData(accountList);
 
                         if (!accountList.isEmpty()) {
@@ -338,18 +334,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
         if (customerId != null) {
             loadUserProfile(customerId);
             loadUserAccounts(customerId);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        Handler handler = (Handler) rvPromotions.getTag(R.id.autoscroll_handler);
-        Runnable runnable = (Runnable) rvPromotions.getTag(R.id.autoscroll_runnable);
-
-        if (handler != null && runnable != null) {
-            handler.removeCallbacks(runnable);
         }
     }
 }

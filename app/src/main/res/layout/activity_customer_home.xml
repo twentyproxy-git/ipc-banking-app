@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -9,6 +8,7 @@
     android:background="#F5F5F5"
     tools:context=".activities.CustomerHomeActivity">
 
+    <!-- HEADER -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="match_parent"
@@ -45,27 +45,32 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/btn_support_chat"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="25dp"
-            app:cardElevation="4dp"
+        <!-- Nút Logout -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btn_logout"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="4dp"
+            app:cardBackgroundColor="#701715"
+            app:cardCornerRadius="18dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="#bf9c7a"
+            app:cardElevation="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/img_support_icon"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_support_agent" />
-        </androidx.cardview.widget.CardView>
+                android:src="@drawable/ic_logout"
+                app:tint="#bf9c7a" />
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- CONTENT SCROLL -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -78,6 +83,7 @@
             android:orientation="vertical"
             android:paddingBottom="24dp">
 
+            <!-- BANNER & ACCOUNTS SECTION -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -124,6 +130,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/tv_accounts_title" />
 
+                <!-- RecyclerView hiển thị thẻ -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_accounts_carousel"
                     android:layout_width="match_parent"
@@ -153,6 +160,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- QUICK ACTIONS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -163,6 +171,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- Row 1: Transfer, Pay Bill, Flight, Ticket -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -170,6 +179,7 @@
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="12dp">
 
+                <!-- 1. Transfer -->
                 <LinearLayout
                     android:id="@+id/btn_transfer"
                     android:layout_width="0dp"
@@ -200,6 +210,7 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
+                <!-- 2. Pay Bill -->
                 <LinearLayout
                     android:id="@+id/btn_pay_bill"
                     android:layout_width="0dp"
@@ -230,6 +241,79 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
+                <!-- 3. Flight [MỚI TÁCH RA] -->
+                <LinearLayout
+                    android:id="@+id/btn_flight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="2dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_menu_send"
+                            app:tint="#590303" />
+                    </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Flight"
+                        android:textColor="#333333"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- 4. Ticket [MỚI TÁCH RA] -->
+                <LinearLayout
+                    android:id="@+id/btn_ticket"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="2dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_menu_agenda"
+                            app:tint="#590303" />
+                    </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Ticket"
+                        android:textColor="#333333"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Row 2: Deposit, Withdraw, Verify ID -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="12dp">
+
+                <!-- 5. Deposit -->
                 <LinearLayout
                     android:id="@+id/btn_deposit"
                     android:layout_width="0dp"
@@ -260,6 +344,7 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
+                <!-- 6. Withdraw -->
                 <LinearLayout
                     android:id="@+id/btn_withdraw"
                     android:layout_width="0dp"
@@ -289,15 +374,8 @@
                         android:textColor="#333333"
                         android:textSize="12sp" />
                 </LinearLayout>
-            </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:layout_marginTop="12dp">
-
+                <!-- 7. Verify ID (KYC) -->
                 <LinearLayout
                     android:id="@+id/btn_verify_kyc"
                     android:layout_width="0dp"
@@ -335,6 +413,7 @@
                             app:cardBackgroundColor="#D32F2F"
                             app:cardCornerRadius="9dp"
                             app:cardElevation="4dp">
+
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -346,6 +425,7 @@
                                 android:includeFontPadding="false"/>
                         </androidx.cardview.widget.CardView>
                     </FrameLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -355,20 +435,15 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
+                <!-- Empty Slot for spacing -->
                 <View
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+
             </LinearLayout>
 
+            <!-- PROMOTIONS -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -401,6 +476,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- BOTTOM NAV -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_bar"
         android:layout_width="match_parent"
@@ -411,6 +487,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/customer_bottom_menu" />
 
+    <!-- FLOATING AVATAR -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_avatar_header"
         android:layout_width="80dp"

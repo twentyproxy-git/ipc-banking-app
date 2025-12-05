@@ -8,11 +8,14 @@ import java.util.Date;
 public class TransactionItem implements Serializable {
     private String id;
 
-    @PropertyName("sender_id")
-    private String senderId;
+    @PropertyName("type")
+    private String type;
 
     @PropertyName("sender_account")
     private String senderAccount;
+
+    @PropertyName("sender_name")
+    private String senderName;
 
     @PropertyName("receiver_account")
     private String receiverAccount;
@@ -20,14 +23,14 @@ public class TransactionItem implements Serializable {
     @PropertyName("receiver_name")
     private String receiverName;
 
+    @PropertyName("counterparty_bank")
+    private String counterpartyBank;
+
     @PropertyName("amount")
     private double amount;
 
     @PropertyName("message")
     private String message;
-
-    @PropertyName("type")
-    private String type;
 
     @PropertyName("status")
     private String status;
@@ -35,36 +38,46 @@ public class TransactionItem implements Serializable {
     @PropertyName("created_at")
     private Date createdAt;
 
-    public TransactionItem() { }
+    public TransactionItem() {}
 
-    public TransactionItem(String senderId, String senderAccount, String receiverAccount, String receiverName, double amount, String message, String type, String status, Date createdAt) {
-        this.senderId = senderId;
+    public TransactionItem(String type,
+                           String senderAccount, String senderName,
+                           String receiverAccount, String receiverName,
+                           String counterpartyBank,
+                           double amount,
+                           String message,
+                           String status,
+                           Date createdAt) {
+        this.type = type;
         this.senderAccount = senderAccount;
+        this.senderName = senderName;
         this.receiverAccount = receiverAccount;
         this.receiverName = receiverName;
+        this.counterpartyBank = counterpartyBank;
         this.amount = amount;
         this.message = message;
-        this.type = type;
         this.status = status;
         this.createdAt = createdAt;
     }
 
-    // --- GETTERS & SETTERS ---
-
     @Exclude
     public String getId() { return id; }
-
     public void setId(String id) { this.id = id; }
 
-    @PropertyName("sender_id")
-    public String getSenderId() { return senderId; }
-    @PropertyName("sender_id")
-    public void setSenderId(String senderId) { this.senderId = senderId; }
+    @PropertyName("type")
+    public String getType() { return type; }
+    @PropertyName("type")
+    public void setType(String type) { this.type = type; }
 
     @PropertyName("sender_account")
     public String getSenderAccount() { return senderAccount; }
     @PropertyName("sender_account")
     public void setSenderAccount(String senderAccount) { this.senderAccount = senderAccount; }
+
+    @PropertyName("sender_name")
+    public String getSenderName() { return senderName; }
+    @PropertyName("sender_name")
+    public void setSenderName(String senderName) { this.senderName = senderName; }
 
     @PropertyName("receiver_account")
     public String getReceiverAccount() { return receiverAccount; }
@@ -76,6 +89,11 @@ public class TransactionItem implements Serializable {
     @PropertyName("receiver_name")
     public void setReceiverName(String receiverName) { this.receiverName = receiverName; }
 
+    @PropertyName("counterparty_bank")
+    public String getCounterpartyBank() { return counterpartyBank; }
+    @PropertyName("counterparty_bank")
+    public void setCounterpartyBank(String counterpartyBank) { this.counterpartyBank = counterpartyBank; }
+
     @PropertyName("amount")
     public double getAmount() { return amount; }
     @PropertyName("amount")
@@ -85,11 +103,6 @@ public class TransactionItem implements Serializable {
     public String getMessage() { return message; }
     @PropertyName("message")
     public void setMessage(String message) { this.message = message; }
-
-    @PropertyName("type")
-    public String getType() { return type; }
-    @PropertyName("type")
-    public void setType(String type) { this.type = type; }
 
     @PropertyName("status")
     public String getStatus() { return status; }
