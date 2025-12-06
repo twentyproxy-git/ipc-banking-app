@@ -39,7 +39,7 @@
             android:value="AIzaSyDm3i47MIRG5TttHqzA9GpupdSB42p0SMU" />
 
         <activity
-            android:name=".activities.WithdrawActivity"
+            android:name=".activities.WithdrawalActivity"
             android:exported="false" />
         <activity
             android:name=".activities.DepositActivity"
@@ -75,7 +75,7 @@
             </intent-filter>
         </activity> <!-- Main Activity -->
         <activity
-            android:name=".activities.BankOfficerActivity"
+            android:name=".activities.OfficerHomeActivity"
             android:exported="false" />
     </application>
 

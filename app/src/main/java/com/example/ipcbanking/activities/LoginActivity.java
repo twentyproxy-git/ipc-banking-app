@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                             Intent intent;
                             if (role.equals("OFFICER")) {
                                 Toast.makeText(LoginActivity.this, "Welcome Bank Officer!", Toast.LENGTH_SHORT).show();
-                                intent = new Intent(LoginActivity.this, BankOfficerActivity.class);
+                                intent = new Intent(LoginActivity.this, OfficerHomeActivity.class);
                                 intent.putExtra("OFFICER_ID", uid);
                             } else {
                                 Toast.makeText(LoginActivity.this, "Welcome Customer!", Toast.LENGTH_SHORT).show();

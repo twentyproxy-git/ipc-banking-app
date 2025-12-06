@@ -21,7 +21,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
-import com.example.ipcbanking.models.TransactionItem;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,15 +32,13 @@ import com.google.firebase.firestore.FieldValue;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class WithdrawActivity extends AppCompatActivity {
+public class WithdrawalActivity extends AppCompatActivity {
 
     private ImageView btnBack;
     private TextView tvAccountNumber, tvAccountBalance;

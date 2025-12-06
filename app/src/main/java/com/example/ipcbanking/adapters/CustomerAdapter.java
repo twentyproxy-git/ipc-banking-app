@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide; // Thư viện load ảnh
 import com.example.ipcbanking.R;
-import com.example.ipcbanking.models.CustomerItem;
+import com.example.ipcbanking.models.UserItem;
 import com.example.ipcbanking.viewholders.CustomerViewHolder;
 
 import java.util.ArrayList;
@@ -19,22 +19,22 @@ import java.util.List;
 public class CustomerAdapter extends RecyclerView.Adapter<CustomerViewHolder> {
 
     private Context context;
-    private List<CustomerItem> customerList;
+    private List<UserItem> customerList;
     private OnCustomerClickListener listener;
 
     // Interface để xử lý sự kiện click ra bên ngoài
     public interface OnCustomerClickListener {
-        void onCustomerClick(CustomerItem customer);
+        void onCustomerClick(UserItem customer);
     }
 
-    public CustomerAdapter(Context context, List<CustomerItem> customerList, OnCustomerClickListener listener) {
+    public CustomerAdapter(Context context, List<UserItem> customerList, OnCustomerClickListener listener) {
         this.context = context;
         this.customerList = customerList;
         this.listener = listener;
     }
 
     // Hàm cập nhật list (Dùng cho tính năng Tìm kiếm)
-    public void updateList(List<CustomerItem> newList) {
+    public void updateList(List<UserItem> newList) {
         this.customerList = new ArrayList<>(newList);
         notifyDataSetChanged();
     }
@@ -48,7 +48,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CustomerViewHolder holder, int position) {
-        CustomerItem customer = customerList.get(position);
+        UserItem customer = customerList.get(position);
 
         // 1. Gán Text
         holder.tvName.setText(customer.getFullName());

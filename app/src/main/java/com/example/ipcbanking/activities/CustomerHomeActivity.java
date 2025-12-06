@@ -240,7 +240,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
 
         btnWithdraw.setOnClickListener(v -> {
-            Intent intent = new Intent(CustomerHomeActivity.this, WithdrawActivity.class);
+            Intent intent = new Intent(CustomerHomeActivity.this, WithdrawalActivity.class);
             intent.putExtra("CUSTOMER_ID", customerId);
             startActivity(intent);
         });

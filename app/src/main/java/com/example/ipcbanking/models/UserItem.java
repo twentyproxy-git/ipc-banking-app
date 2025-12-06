@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-public class CustomerItem implements Serializable {
+public class UserItem implements Serializable {
 
     private String uid; // ID Document
 
@@ -43,8 +43,7 @@ public class CustomerItem implements Serializable {
     @PropertyName("device_token")
     private String deviceToken;
 
-    // Constructor rỗng (Bắt buộc cho Firestore)
-    public CustomerItem() { }
+    public UserItem() { }
 
     // --- GETTERS & SETTERS ---
 

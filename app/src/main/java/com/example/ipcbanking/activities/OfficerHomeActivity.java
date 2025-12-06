@@ -1,7 +1,6 @@
 package com.example.ipcbanking.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -29,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ipcbanking.adapters.CustomerAdapter;
 import com.example.ipcbanking.R;
-import com.example.ipcbanking.models.CustomerItem;
+import com.example.ipcbanking.models.UserItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BankOfficerActivity extends AppCompatActivity {
+public class OfficerHomeActivity extends AppCompatActivity {
 
     // Khai báo Views
     private LinearLayout btnSearchCustomer;
@@ -66,7 +65,7 @@ public class BankOfficerActivity extends AppCompatActivity {
     private CustomerAdapter adapter;
 
     // Dữ liệu
-    private List<CustomerItem> fullList = new ArrayList<>();
+    private List<UserItem> fullList = new ArrayList<>();
     private FirebaseFirestore db;
 
     @Override
@@ -128,7 +127,7 @@ public class BankOfficerActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         rvCustomers.setLayoutManager(new LinearLayoutManager(this));
         adapter = new CustomerAdapter(this, fullList, customer -> {
-            Intent intent = new Intent(BankOfficerActivity.this, EditCustomerActivity.class);
+            Intent intent = new Intent(OfficerHomeActivity.this, EditCustomerActivity.class);
             intent.putExtra("CUSTOMER_ID", customer.getUid());
             startActivity(intent);
         });
@@ -138,7 +137,7 @@ public class BankOfficerActivity extends AppCompatActivity {
     private void setupCreateCustomerLogic() {
         if (btnCreateAccount != null) {
             btnCreateAccount.setOnClickListener(v -> {
-                Intent intent = new Intent(BankOfficerActivity.this, AddCustomerActivity.class);
+                Intent intent = new Intent(OfficerHomeActivity.this, AddCustomerActivity.class);
                 startActivity(intent);
             });
         }
@@ -253,8 +252,8 @@ public class BankOfficerActivity extends AppCompatActivity {
     }
 
     private void filter(String text) {
-        List<CustomerItem> filteredList = new ArrayList<>();
-        for (CustomerItem item : fullList) {
+        List<UserItem> filteredList = new ArrayList<>();
+        for (UserItem item : fullList) {
             if (item.getFullName().toLowerCase().contains(text.toLowerCase()) ||
                     item.getPhoneNumber().contains(text)) {
                 filteredList.add(item);
@@ -268,14 +267,14 @@ public class BankOfficerActivity extends AppCompatActivity {
         btnHomeLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(BankOfficerActivity.this, LoginActivity.class);
+            Intent intent = new Intent(OfficerHomeActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
         });
 
         btnViewEkyc.setOnClickListener(v -> {
-            Intent intent = new Intent(BankOfficerActivity.this, ReviewRequestActivity.class);
+            Intent intent = new Intent(OfficerHomeActivity.this, ReviewRequestActivity.class);
             startActivity(intent);
         });
     }
@@ -288,7 +287,7 @@ public class BankOfficerActivity extends AppCompatActivity {
                     fullList.clear();
                     if (!querySnapshot.isEmpty()) {
                         for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                            CustomerItem item = doc.toObject(CustomerItem.class);
+                            UserItem item = doc.toObject(UserItem.class);
                             if (item != null) {
                                 item.setUid(doc.getId());
                                 fullList.add(item);
@@ -304,7 +303,7 @@ public class BankOfficerActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateListVisibility(List<CustomerItem> list) {
+    private void updateListVisibility(List<UserItem> list) {
         if (list == null || list.isEmpty()) {
             rvCustomers.setVisibility(View.GONE);
             if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);

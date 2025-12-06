@@ -10,7 +10,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -29,7 +28,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.ipcbanking.R;
-import com.example.ipcbanking.models.BankBranch;
+import com.example.ipcbanking.models.BankBranchItem;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -73,8 +72,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     // Data
     private FirebaseFirestore db;
-    private List<BankBranch> branches = new ArrayList<>();
-    private BankBranch selectedBranch = null;
+    private List<BankBranchItem> branches = new ArrayList<>();
+    private BankBranchItem selectedBranch = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,7 +183,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     branches.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        BankBranch branch = doc.toObject(BankBranch.class);
+                        BankBranchItem branch = doc.toObject(BankBranchItem.class);
                         if (branch != null) {
                             branch.setId(doc.getId());
                             branches.add(branch);
@@ -247,7 +246,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Bank Branch");
         builder.setItems(branchNames, (dialog, which) -> {
-            BankBranch selected = branches.get(which);
+            BankBranchItem selected = branches.get(which);
 
             LatLng branchLoc = new LatLng(selected.getLatitude(), selected.getLongitude());
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(branchLoc, 16));
@@ -283,8 +282,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mMap.setOnMarkerClickListener(marker -> {
             Object tag = marker.getTag();
-            if (tag instanceof BankBranch) {
-                showBranchInfo((BankBranch) tag);
+            if (tag instanceof BankBranchItem) {
+                showBranchInfo((BankBranchItem) tag);
             }
             return false;
         });
@@ -296,7 +295,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (mMap == null) return;
         mMap.clear();
 
-        for (BankBranch branch : branches) {
+        for (BankBranchItem branch : branches) {
             LatLng position = new LatLng(branch.getLatitude(), branch.getLongitude());
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(position)
@@ -332,7 +331,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void showBranchInfo(BankBranch branch) {
+    private void showBranchInfo(BankBranchItem branch) {
         selectedBranch = branch;
         tvBranchName.setText(branch.getName());
         tvBranchAddress.setText(branch.getAddress());
@@ -367,10 +366,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return;
         }
 
-        BankBranch nearestBranch = null;
+        BankBranchItem nearestBranch = null;
         float minDistance = Float.MAX_VALUE;
 
-        for (BankBranch branch : branches) {
+        for (BankBranchItem branch : branches) {
             float[] results = new float[1];
             Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
                     branch.getLatitude(), branch.getLongitude(), results);

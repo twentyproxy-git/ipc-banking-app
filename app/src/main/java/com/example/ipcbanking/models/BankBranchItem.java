@@ -3,7 +3,7 @@ package com.example.ipcbanking.models;
 import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
 
-public class BankBranch implements Serializable {
+public class BankBranchItem implements Serializable {
     private String id;
 
     @PropertyName("name")
@@ -21,10 +21,9 @@ public class BankBranch implements Serializable {
     @PropertyName("opening_hours")
     private String openingHours;
 
-    // Constructor rỗng bắt buộc cho Firestore
-    public BankBranch() { }
+    public BankBranchItem() { }
 
-    public BankBranch(String id, String name, String address, double latitude, double longitude, String openingHours) {
+    public BankBranchItem(String id, String name, String address, double latitude, double longitude, String openingHours) {
         this.id = id;
         this.name = name;
         this.address = address;

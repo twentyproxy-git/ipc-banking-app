@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5"
     android:id="@+id/main"
-    tools:context=".activities.BankOfficerActivity">
+    tools:context=".activities.OfficerHomeActivity">
 
     <!-- (Giữ nguyên phần Header như cũ) -->
     <View
