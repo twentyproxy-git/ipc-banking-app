@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    // CLOUDINARY
     implementation("com.cloudinary:cloudinary-android:2.4.0") {
         exclude(group = "com.facebook.fresco")
     }
@@ -44,7 +45,7 @@ dependencies {
     implementation("com.facebook.fresco:animated-webp:3.2.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // [GOOGLE MAPS] Thêm dòng này
+    // GOOGLE MAPS
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
 

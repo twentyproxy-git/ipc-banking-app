@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Face Verification"
+        android:textColor="#333333"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="Please position your face within the frame and hold still."
+        android:textColor="#757575"
+        android:textSize="14sp" />
+
+    <!-- Khung mô phỏng Camera -->
+    <FrameLayout
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp">
+
+        <!-- Hình nền mặt người (Placeholder) -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_scan_face"
+            android:scaleType="fitCenter"
+            android:padding="20dp"
+            android:alpha="0.3"
+            android:background="@drawable/border_screen"/>
+        <!-- Lưu ý: border_screen là drawable viền bạn đã có, hoặc dùng shape tròn -->
+
+        <!-- Vạch quét (Scan Line) -->
+        <View
+            android:id="@+id/scan_line"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#00FF00"
+            android:layout_gravity="top"/>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_scan_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scanning..."
+        android:textColor="#590303"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <ProgressBar
+        android:id="@+id/pb_scanning"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:indeterminateTint="#590303" />
+
+</LinearLayout>

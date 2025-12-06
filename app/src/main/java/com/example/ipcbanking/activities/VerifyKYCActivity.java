@@ -1,18 +1,27 @@
 package com.example.ipcbanking.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -29,7 +38,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.utils.CloudinaryHelper;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -42,27 +50,20 @@ public class VerifyKYCActivity extends AppCompatActivity {
 
     private static final int PERMISSION_CODE = 100;
 
-    // View Components
     private ImageView btnBack;
     private View layoutUploadForm, layoutPendingState;
     private Button btnBackHome, btnSubmit;
     private TextInputEditText etIdCardNumber;
 
-    // Image Views
     private ImageView imgIdDoc, imgFace;
+    private View btnCamId, btnGalId, btnCamFace, btnGalFace;
 
-    // Floating Buttons
-    private View btnCamId, btnGalId;
-    private View btnCamFace, btnGalFace;
-
-    // Data
     private FirebaseFirestore db;
     private String customerId;
     private Bitmap bitmapIdDoc = null;
     private Bitmap bitmapFace = null;
     private int currentCaptureTarget = 0; // 1: ID Card, 2: Face
 
-    // Launchers
     private ActivityResultLauncher<Intent> cameraLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
 
@@ -78,9 +79,7 @@ public class VerifyKYCActivity extends AppCompatActivity {
             return insets;
         });
 
-        // 1. Init Cloudinary
         CloudinaryHelper.initCloudinary(this);
-
         db = FirebaseFirestore.getInstance();
         customerId = getIntent().getStringExtra("CUSTOMER_ID");
 
@@ -100,7 +99,6 @@ public class VerifyKYCActivity extends AppCompatActivity {
         imgIdDoc = findViewById(R.id.img_id_doc);
         imgFace = findViewById(R.id.img_face);
 
-        // Buttons
         btnCamId = findViewById(R.id.btn_cam_id);
         btnGalId = findViewById(R.id.btn_gal_id);
         btnCamFace = findViewById(R.id.btn_cam_face);
@@ -109,9 +107,7 @@ public class VerifyKYCActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btn_submit_kyc);
     }
 
-    // === CẤU HÌNH LAUNCHER ===
     private void setupResultLaunchers() {
-        // Camera Launcher
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -123,7 +119,6 @@ public class VerifyKYCActivity extends AppCompatActivity {
                 }
         );
 
-        // Gallery Launcher
         galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
@@ -158,30 +153,27 @@ public class VerifyKYCActivity extends AppCompatActivity {
         targetView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
-    // === XỬ LÝ SỰ KIỆN CLICK CHO TỪNG NÚT ===
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
         btnBackHome.setOnClickListener(v -> finish());
 
-        // ID Card - Camera
+        // ID Card Camera and Gallery Event
         btnCamId.setOnClickListener(v -> {
             currentCaptureTarget = 1;
             checkPermissionAndOpenCamera();
         });
 
-        // ID Card - Gallery
         btnGalId.setOnClickListener(v -> {
             currentCaptureTarget = 1;
             checkPermissionAndOpenGallery();
         });
 
-        // Face - Camera
+        // Face Camera and Gallery Event
         btnCamFace.setOnClickListener(v -> {
             currentCaptureTarget = 2;
-            checkPermissionAndOpenCamera();
+            showFaceScanDialog();
         });
 
-        // Face - Gallery
         btnGalFace.setOnClickListener(v -> {
             currentCaptureTarget = 2;
             checkPermissionAndOpenGallery();
@@ -190,7 +182,46 @@ public class VerifyKYCActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(v -> startUploadProcess());
     }
 
-    // === PERMISSIONS & OPENING INTENTS ===
+    private void showFaceScanDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_face_scan_kyc, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        dialog.setCancelable(false);
+
+        View scanLine = dialogView.findViewById(R.id.scan_line);
+        TextView tvStatus = dialogView.findViewById(R.id.tv_scan_status);
+        View pbScanning = dialogView.findViewById(R.id.pb_scanning);
+
+        TranslateAnimation animation = new TranslateAnimation(
+                Animation.ABSOLUTE, 0f, Animation.ABSOLUTE, 0f,
+                Animation.RELATIVE_TO_PARENT, 0f, Animation.RELATIVE_TO_PARENT, 0.9f);
+        animation.setDuration(1500);
+        animation.setRepeatCount(1);
+        animation.setRepeatMode(Animation.REVERSE);
+        scanLine.startAnimation(animation);
+
+        dialog.show();
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (!isFinishing()) {
+                scanLine.clearAnimation();
+                tvStatus.setText("Face Detected! ✅");
+                tvStatus.setTextColor(Color.parseColor("#388E3C"));
+                pbScanning.setVisibility(View.GONE);
+
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    dialog.dismiss();
+                    checkPermissionAndOpenCamera();
+                }, 500);
+            }
+        }, 3000);
+    }
+
     private void checkPermissionAndOpenCamera() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CODE);
@@ -215,7 +246,7 @@ public class VerifyKYCActivity extends AppCompatActivity {
         try {
             cameraLauncher.launch(takePictureIntent);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "No Camera App found on device", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No Camera App found", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -228,14 +259,18 @@ public class VerifyKYCActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted! Tap button again.", Toast.LENGTH_SHORT).show();
+                // Nếu vừa cấp quyền xong thì check lại target để mở đúng cái cần mở
+                if (currentCaptureTarget == 2) {
+                    showFaceScanDialog();
+                } else {
+                    openCamera(); // ID Card thì mở luôn
+                }
             } else {
                 Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // === LOGIC UPLOAD & FIREBASE (Giữ nguyên) ===
     private void checkCurrentKycStatus() {
         if (customerId == null) return;
         db.collection("users").document(customerId).get().addOnSuccessListener(documentSnapshot -> {
