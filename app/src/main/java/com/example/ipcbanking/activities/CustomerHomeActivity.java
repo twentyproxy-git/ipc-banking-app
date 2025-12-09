@@ -36,7 +36,6 @@ import java.util.List;
 
 public class CustomerHomeActivity extends AppCompatActivity {
 
-    // --- 1. KHAI BÁO BIẾN ---
     private TextView tvWelcomeName, tvEmptyAccount;
     private TextView btnViewDetailAction;
     private ImageView imgAvatarHeader;
