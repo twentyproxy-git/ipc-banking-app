@@ -111,11 +111,12 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Số dư (Mặc định bị che) -->
             <TextView
                 android:id="@+id/tv_card_balance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="50,000,000 VND"
+                android:text="****** VND"
                 android:textColor="#FFFFFF"
                 android:textSize="22sp"
                 android:textStyle="bold"
@@ -123,6 +124,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/img_card_chip"
                 app:layout_constraintVertical_bias="0.4" />
+
+            <!-- [MỚI] Icon Mắt -->
+            <ImageView
+                android:id="@+id/img_visibility_detail"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_eye_off"
+                app:tint="#CCFFFFFF"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_card_balance"
+                app:layout_constraintStart_toEndOf="@+id/tv_card_balance"
+                app:layout_constraintTop_toTopOf="@+id/tv_card_balance" />
+
             <TextView
                 android:id="@+id/tv_card_holder_label"
                 android:layout_width="wrap_content"
@@ -138,7 +152,7 @@
                 android:id="@+id/tv_card_holder_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="KAFKA STELLARON"
+                android:text="LOADING..."
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -147,13 +161,14 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- Số thẻ (Mặc định bị che) -->
             <TextView
                 android:id="@+id/tv_card_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
                 android:letterSpacing="0.1"
-                android:text="**** 1234"
+                android:text="**** **** **** ****"
                 android:textColor="#DDFFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -194,7 +209,7 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="24dp"/>
 
-                <!-- Account Number -->
+                <!-- Account Number Detail -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -206,11 +221,12 @@
                         android:text="Account Number"
                         android:textColor="#757575"
                         android:textSize="13sp"/>
+                    <!-- [MỚI] Mặc định che -->
                     <TextView
                         android:id="@+id/tv_detail_acc_num"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="101000000000"
+                        android:text="************"
                         android:textColor="#000000"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -262,11 +278,12 @@
                         android:text="Opened Date"
                         android:textColor="#757575"
                         android:textSize="13sp"/>
+                    <!-- [MỚI] Mặc định che -->
                     <TextView
                         android:id="@+id/tv_detail_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="20/11/2024"
+                        android:text="**/**/****"
                         android:textColor="#000000"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -293,11 +310,12 @@
                         android:text="Interest Rate"
                         android:textColor="#757575"
                         android:textSize="13sp"/>
+                    <!-- [MỚI] Mặc định che -->
                     <TextView
                         android:id="@+id/tv_extra_value"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="5.5%"
+                        android:text="*.*%"
                         android:textColor="#590303"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -328,7 +346,7 @@
                         android:id="@+id/tv_extra_value_2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="15,000,000 VND"
+                        android:text="*** VND"
                         android:textColor="#D32F2F"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -340,7 +358,7 @@
                         android:layout_marginTop="12dp"/>
                 </LinearLayout>
 
-                <!-- [MỚI] Extra Detail 3 (Bi-weekly) -->
+                <!-- Extra Detail 3 -->
                 <LinearLayout
                     android:id="@+id/layout_extra_detail_3"
                     android:layout_width="match_parent"
@@ -359,7 +377,7 @@
                         android:id="@+id/tv_extra_value_3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="7,500,000 VND"
+                        android:text="*** VND"
                         android:textColor="#D32F2F"
                         android:textSize="16sp"
                         android:textStyle="bold"

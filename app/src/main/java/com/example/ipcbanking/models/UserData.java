@@ -1,6 +1,6 @@
 package com.example.ipcbanking.models;
 
-public class UserSeedData {
+public class UserData {
     private String email;
     private String password;
     private String fullName;
@@ -9,11 +9,10 @@ public class UserSeedData {
     private String role;
     private String avatarUrl;
 
-    public UserSeedData() {
+    public UserData() {
     }
 
-    // Cập nhật Constructor thêm address
-    public UserSeedData(String email, String password, String fullName, String phoneNumber, String address, String role, String avatarUrl) {
+    public UserData(String email, String password, String fullName, String phoneNumber, String address, String role, String avatarUrl) {
         this.email = email;
         this.password = password;
         this.fullName = fullName;

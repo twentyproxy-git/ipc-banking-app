@@ -3,7 +3,7 @@ package com.example.ipcbanking.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.ipcbanking.models.UserSeedData;
+import com.example.ipcbanking.models.UserData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,7 +20,7 @@ public class FirebaseSeeder {
 
     private final FirebaseAuth auth;
     private final FirebaseFirestore db;
-    private final List<UserSeedData> seedList = new ArrayList<>();
+    private final List<UserData> seedList = new ArrayList<>();
 
     private final Map<String, String> createdUserIds = new HashMap<>();
 
@@ -38,28 +38,28 @@ public class FirebaseSeeder {
         createdUserIds.clear();
 
         // OFFICERS
-        seedList.add(new UserSeedData("topaz@ipc.com", "topaz123", "Topaz Numby", "0901000111",
+        seedList.add(new UserData("topaz@ipc.com", "topaz123", "Topaz Numby", "0901000111",
                 "Pier Point, Trụ sở IPC", "OFFICER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319532/qmr7tdydrnneiiflkxhb.png"));
 
-        seedList.add(new UserSeedData("aventurine@ipc.com", "aventurine123", "Aventurine Stratos", "0901000222",
+        seedList.add(new UserData("aventurine@ipc.com", "aventurine123", "Aventurine Stratos", "0901000222",
                 "Sigonia-IV, Khu Tài Chính", "OFFICER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319490/jvn1en9l5g1dxzqx7twg.png"));
 
-        seedList.add(new UserSeedData("sunday@ipc.com", "sunday123", "Sunday Halovian", "0901000333",
+        seedList.add(new UserData("sunday@ipc.com", "sunday123", "Sunday Halovian", "0901000333",
                 "Khách sạn Reverie, Penacony", "OFFICER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319526/eouerxvjagmdisvagc6d.png"));
 
         // CUSTOMERS
-        seedList.add(new UserSeedData("kafka@gmail.com", "kafka123", "Kafka", "0909666777",
+        seedList.add(new UserData("kafka@gmail.com", "kafka123", "Kafka", "0909666777",
                 "Pteruges-V, Hầm trú ẩn Stellaron", "CUSTOMER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319508/rnbwc3kipbbtg4y7puhr.png"));
 
-        seedList.add(new UserSeedData("silverwolf@gmail.com", "silverwolf123", "Silver Wolf", "0909888999",
+        seedList.add(new UserData("silverwolf@gmail.com", "silverwolf123", "Silver Wolf", "0909888999",
                 "Punklorde, Tiệm Net 8-bit", "CUSTOMER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319517/mgbqst17h39kfukr8zsf.png"));
 
-        seedList.add(new UserSeedData("firefly@gmail.com", "firefly123", "Firefly", "0909111222",
+        seedList.add(new UserData("firefly@gmail.com", "firefly123", "Firefly", "0909111222",
                 "Glamoth, Căn cứ quân sự", "CUSTOMER",
                 "https://res.cloudinary.com/ipc-media/image/upload/v1764319501/hbqh21rwcyn5rorjlz2h.png"));
 
@@ -107,11 +107,11 @@ public class FirebaseSeeder {
             seedTransactions();
             return;
         }
-        UserSeedData user = seedList.get(index);
+        UserData user = seedList.get(index);
         createOrUpdateUser(user, () -> processUserAtIndex(index + 1));
     }
 
-    private void createOrUpdateUser(UserSeedData u, Runnable onComplete) {
+    private void createOrUpdateUser(UserData u, Runnable onComplete) {
         auth.createUserWithEmailAndPassword(u.getEmail(), u.getPassword())
                 .addOnSuccessListener(authResult -> {
                     FirebaseUser user = authResult.getUser();
@@ -131,7 +131,7 @@ public class FirebaseSeeder {
                 });
     }
 
-    private void saveUserToFirestore(String uid, UserSeedData u, Runnable onComplete) {
+    private void saveUserToFirestore(String uid, UserData u, Runnable onComplete) {
         createdUserIds.put(u.getEmail(), uid);
 
         Map<String, Object> data = new HashMap<>();

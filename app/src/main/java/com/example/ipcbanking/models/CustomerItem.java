@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-public class UserItem implements Serializable {
+public class CustomerItem implements Serializable {
 
     private String uid; // ID Document
 
@@ -43,7 +43,7 @@ public class UserItem implements Serializable {
     @PropertyName("device_token")
     private String deviceToken;
 
-    public UserItem() { }
+    public CustomerItem() { }
 
     // --- GETTERS & SETTERS ---
 

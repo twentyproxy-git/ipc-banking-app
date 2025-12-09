@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ipcbanking.adapters.CustomerAdapter;
 import com.example.ipcbanking.R;
-import com.example.ipcbanking.models.UserItem;
+import com.example.ipcbanking.models.CustomerItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -65,7 +65,7 @@ public class OfficerHomeActivity extends AppCompatActivity {
     private CustomerAdapter adapter;
 
     // Dữ liệu
-    private List<UserItem> fullList = new ArrayList<>();
+    private List<CustomerItem> fullList = new ArrayList<>();
     private FirebaseFirestore db;
 
     @Override
@@ -252,8 +252,8 @@ public class OfficerHomeActivity extends AppCompatActivity {
     }
 
     private void filter(String text) {
-        List<UserItem> filteredList = new ArrayList<>();
-        for (UserItem item : fullList) {
+        List<CustomerItem> filteredList = new ArrayList<>();
+        for (CustomerItem item : fullList) {
             if (item.getFullName().toLowerCase().contains(text.toLowerCase()) ||
                     item.getPhoneNumber().contains(text)) {
                 filteredList.add(item);
@@ -287,7 +287,7 @@ public class OfficerHomeActivity extends AppCompatActivity {
                     fullList.clear();
                     if (!querySnapshot.isEmpty()) {
                         for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                            UserItem item = doc.toObject(UserItem.class);
+                            CustomerItem item = doc.toObject(CustomerItem.class);
                             if (item != null) {
                                 item.setUid(doc.getId());
                                 fullList.add(item);
@@ -303,7 +303,7 @@ public class OfficerHomeActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateListVisibility(List<UserItem> list) {
+    private void updateListVisibility(List<CustomerItem> list) {
         if (list == null || list.isEmpty()) {
             rvCustomers.setVisibility(View.GONE);
             if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);

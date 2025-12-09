@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +34,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide; // [QUAN TRỌNG] Nhớ import Glide
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.utils.CloudinaryHelper;
 import com.google.android.material.textfield.TextInputEditText;
@@ -157,7 +157,7 @@ public class VerifyKYCActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         btnBackHome.setOnClickListener(v -> finish());
 
-        // ID Card Camera and Gallery Event
+        // ID Card
         btnCamId.setOnClickListener(v -> {
             currentCaptureTarget = 1;
             checkPermissionAndOpenCamera();
@@ -168,7 +168,7 @@ public class VerifyKYCActivity extends AppCompatActivity {
             checkPermissionAndOpenGallery();
         });
 
-        // Face Camera and Gallery Event
+        // Face - Camera (Hiện Dialog Scan)
         btnCamFace.setOnClickListener(v -> {
             currentCaptureTarget = 2;
             showFaceScanDialog();
@@ -259,11 +259,10 @@ public class VerifyKYCActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Nếu vừa cấp quyền xong thì check lại target để mở đúng cái cần mở
                 if (currentCaptureTarget == 2) {
                     showFaceScanDialog();
                 } else {
-                    openCamera(); // ID Card thì mở luôn
+                    openCamera();
                 }
             } else {
                 Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
@@ -271,6 +270,7 @@ public class VerifyKYCActivity extends AppCompatActivity {
         }
     }
 
+    // --- [CẬP NHẬT] HÀM LOAD DỮ LIỆU CŨ ---
     private void checkCurrentKycStatus() {
         if (customerId == null) return;
         db.collection("users").document(customerId).get().addOnSuccessListener(documentSnapshot -> {
@@ -282,9 +282,39 @@ public class VerifyKYCActivity extends AppCompatActivity {
                     showPendingState();
                 } else {
                     showUploadForm();
-                    if (kycData != null && kycData.containsKey("id_card_number")) {
-                        etIdCardNumber.setText((String) kycData.get("id_card_number"));
+
+                    if (kycData != null) {
+                        // 1. Load số CCCD
+                        if (kycData.containsKey("id_card_number")) {
+                            etIdCardNumber.setText((String) kycData.get("id_card_number"));
+                        }
+
+                        // 2. [MỚI] Load ảnh CCCD nếu có
+                        String idCardUrl = (String) kycData.get("id_card_url");
+                        if (idCardUrl != null && !idCardUrl.isEmpty()) {
+                            // Dùng Glide load ảnh
+                            Glide.with(this).load(idCardUrl).into(imgIdDoc);
+
+                            // Chỉnh lại Style cho giống ảnh mới chụp (bỏ padding, scale đẹp)
+                            imgIdDoc.setPadding(0, 0, 0, 0);
+                            imgIdDoc.setColorFilter(null);
+                            imgIdDoc.setImageTintList(null);
+                            imgIdDoc.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        }
+
+                        // 3. [MỚI] Load ảnh Face nếu có
+                        String faceUrl = (String) kycData.get("face_image_url");
+                        if (faceUrl != null && !faceUrl.isEmpty()) {
+                            Glide.with(this).load(faceUrl).into(imgFace);
+
+                            // Chỉnh lại Style
+                            imgFace.setPadding(0, 0, 0, 0);
+                            imgFace.setColorFilter(null);
+                            imgFace.setImageTintList(null);
+                            imgFace.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        }
                     }
+
                     if ("VERIFIED".equals(status)) {
                         btnSubmit.setText("Update & Re-verify");
                     }
@@ -310,8 +340,13 @@ public class VerifyKYCActivity extends AppCompatActivity {
         if (idNumber.length() < 9) {
             etIdCardNumber.setError("Invalid ID"); return;
         }
+
+        // Nếu user chỉ muốn cập nhật số ID mà giữ nguyên ảnh cũ thì sao?
+        // Logic hiện tại bắt buộc phải chụp lại cả 2 ảnh mới cho phép submit.
+        // Bạn có thể tùy chỉnh logic này nếu muốn cho phép dùng ảnh cũ.
         if (bitmapIdDoc == null || bitmapFace == null) {
-            Toast.makeText(this, "Please provide both photos!", Toast.LENGTH_SHORT).show(); return;
+            Toast.makeText(this, "Please take new photos to verify!", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         btnSubmit.setEnabled(false);

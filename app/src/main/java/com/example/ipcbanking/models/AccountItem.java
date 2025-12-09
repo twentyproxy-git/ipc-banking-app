@@ -20,12 +20,9 @@ public class AccountItem implements Serializable {
     @PropertyName("owner_id")
     private String ownerId;
 
-    // [SỬA LỖI Ở ĐÂY]
-    // Đổi từ Timestamp sang Date để không bị lỗi Serializable khi chuyển màn hình
     @PropertyName("created_at")
     private Date createdAt;
 
-    // Các trường khác (nếu có) như profit_rate, monthly_payment...
     @PropertyName("profit_rate")
     private double profitRate;
 

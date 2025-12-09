@@ -1,8 +1,15 @@
 package com.example.ipcbanking.activities;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +33,13 @@ import com.example.ipcbanking.adapters.PromotionAdapter;
 import com.example.ipcbanking.models.AccountItem;
 import com.example.ipcbanking.models.PromotionItem;
 import com.example.ipcbanking.utils.SpaceItemDecoration;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -36,6 +48,7 @@ import java.util.List;
 
 public class CustomerHomeActivity extends AppCompatActivity {
 
+    // --- 1. KHAI BÁO BIẾN ---
     private TextView tvWelcomeName, tvEmptyAccount;
     private TextView btnViewDetailAction;
     private ImageView imgAvatarHeader;
@@ -85,8 +98,8 @@ public class CustomerHomeActivity extends AppCompatActivity {
             return;
         }
 
-        setupRecyclerViewWithSnap(); // Accounts
-        setupPromotionsRecyclerView(); // Promotions
+        setupRecyclerViewWithSnap();
+        setupPromotionsRecyclerView();
         setupBottomNavigation();
         setupClickListeners();
 
@@ -126,7 +139,13 @@ public class CustomerHomeActivity extends AppCompatActivity {
         int spaceInPixels = (int) (50 * getResources().getDisplayMetrics().density);
         rvAccountsCarousel.addItemDecoration(new SpaceItemDecoration(spaceInPixels));
 
-        accountAdapter = new AccountAdapter(this, accountList);
+        accountAdapter = new AccountAdapter(this, accountList, currentStatus -> {
+            if (currentStatus) {
+                accountAdapter.setVisibilityState(false);
+            } else {
+                showPasswordConfirmationDialog();
+            }
+        });
         rvAccountsCarousel.setAdapter(accountAdapter);
 
         snapHelper = new LinearSnapHelper();
@@ -149,12 +168,59 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
     }
 
+    private void showPasswordConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_password_confirm, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        EditText etPassword = dialogView.findViewById(R.id.et_password_confirm);
+        Button btnCancel = dialogView.findViewById(R.id.btn_cancel_password);
+        Button btnConfirm = dialogView.findViewById(R.id.btn_confirm_password);
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            String password = etPassword.getText().toString();
+            if (!password.isEmpty()) {
+                verifyPasswordWithFirebase(password, dialog);
+            } else {
+                Toast.makeText(this, "Password required!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void verifyPasswordWithFirebase(String password, AlertDialog dialog) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && user.getEmail() != null) {
+            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+
+            user.reauthenticate(credential)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Verified Successfully", Toast.LENGTH_SHORT).show();
+                        // Mở khóa adapter
+                        accountAdapter.setVisibilityState(true);
+                        dialog.dismiss(); // Đóng dialog
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Incorrect Password!", Toast.LENGTH_SHORT).show();
+                        // Không đóng dialog để user nhập lại
+                    });
+        }
+    }
+
     private void setupPromotionsRecyclerView() {
         rvPromotions.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         promotionList.clear();
-        promotionList.add(new PromotionItem(R.drawable.ic_promotion_05));
         promotionList.add(new PromotionItem(R.drawable.ic_promotion_04));
+        promotionList.add(new PromotionItem(R.drawable.ic_promotion_05));
         promotionList.add(new PromotionItem(R.drawable.ic_promotion_03));
 
         promotionAdapter = new PromotionAdapter(this, promotionList);
@@ -197,7 +263,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        // Detail & Profile
         btnViewDetailAction.setOnClickListener(v -> {
             if (currentSelectedAccount != null) {
                 Intent intent = new Intent(CustomerHomeActivity.this, AccountDetailActivity.class);
@@ -207,9 +272,9 @@ public class CustomerHomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "No account selected!", Toast.LENGTH_SHORT).show();
             }
         });
+
         cardAvatarHeader.setOnClickListener(v -> openProfileActivity());
 
-        // Quick Actions
         btnTransfer.setOnClickListener(v -> {
 //            if (currentSelectedAccount != null) {
 //                Intent intent = new Intent(CustomerHomeActivity.this, TransferActivity.class);
@@ -251,19 +316,12 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
 
         btnLogout.setOnClickListener(v -> {
-            new androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setTitle("Logout")
-                    .setMessage("Do you really want to log out?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        FirebaseAuth.getInstance().signOut();
-                        Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(CustomerHomeActivity.this, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                    .show();
+            FirebaseAuth.getInstance().signOut();
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(CustomerHomeActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         });
     }
 
@@ -311,13 +369,12 @@ public class CustomerHomeActivity extends AppCompatActivity {
                     if (accountList.isEmpty()) {
                         rvAccountsCarousel.setVisibility(View.GONE);
                         tvEmptyAccount.setVisibility(View.VISIBLE);
-                        btnViewDetailAction.setVisibility(View.GONE);
+                        btnViewDetailAction.setVisibility(View.GONE);;
                         currentSelectedAccount = null;
                     } else {
                         rvAccountsCarousel.setVisibility(View.VISIBLE);
                         tvEmptyAccount.setVisibility(View.GONE);
                         btnViewDetailAction.setVisibility(View.VISIBLE);
-
                         accountAdapter.setData(accountList);
 
                         if (!accountList.isEmpty()) {

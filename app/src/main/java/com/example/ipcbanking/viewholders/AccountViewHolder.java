@@ -19,7 +19,7 @@ public class AccountViewHolder extends RecyclerView.ViewHolder {
         tvBankName = itemView.findViewById(R.id.tv_bank_name);
         tvCardType = itemView.findViewById(R.id.tv_card_type);
         tvBalance = itemView.findViewById(R.id.tv_balance);
-        tvAccountNumber = itemView.findViewById(R.id.tv_account_number);
+        tvAccountNumber = itemView.findViewById(R.id.tv_card_number);
         imgVisibility = itemView.findViewById(R.id.img_visibility);
         imgChip = itemView.findViewById(R.id.img_chip);
     }
