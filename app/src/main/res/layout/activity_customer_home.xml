@@ -241,7 +241,7 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- 3. Flight [MỚI TÁCH RA] -->
+                <!-- 3. Flight -->
                 <LinearLayout
                     android:id="@+id/btn_flight"
                     android:layout_width="0dp"
@@ -272,7 +272,7 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- 4. Ticket [MỚI TÁCH RA] -->
+                <!-- 4. Ticket -->
                 <LinearLayout
                     android:id="@+id/btn_ticket"
                     android:layout_width="0dp"
@@ -305,7 +305,7 @@
 
             </LinearLayout>
 
-            <!-- Row 2: Deposit, Withdraw, Verify ID -->
+            <!-- Row 2: Deposit, Withdraw, Verify ID, Top-up -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -435,11 +435,36 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Empty Slot for spacing -->
-                <View
+                <!-- 8. Top-up -->
+                <LinearLayout
+                    android:id="@+id/btn_top_up"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="2dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_menu_call"
+                            app:tint="#590303" />
+                    </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Top-up"
+                        android:textColor="#333333"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
             </LinearLayout>
 

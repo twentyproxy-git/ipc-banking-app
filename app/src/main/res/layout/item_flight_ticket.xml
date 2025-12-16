@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/tv_promo_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FF5722"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="Duy nhất 15.12 | nhập BAY15 giảm đến 100k"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/img_airline_logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_promo_badge" />
+
+        <TextView
+            android:id="@+id/tv_dep_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="23:25"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/img_airline_logo"
+            app:layout_constraintTop_toTopOf="@id/img_airline_logo" />
+
+        <TextView
+            android:id="@+id/tv_dep_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SGN"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/tv_dep_time"
+            app:layout_constraintStart_toStartOf="@id/tv_dep_time"
+            app:layout_constraintTop_toBottomOf="@id/tv_dep_time" />
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:text="2h 10m"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_dep_time"
+            app:layout_constraintEnd_toStartOf="@id/tv_arr_time"
+            app:layout_constraintStart_toEndOf="@id/tv_dep_time"
+            app:layout_constraintTop_toTopOf="@id/tv_dep_time" />
+
+        <View
+            android:id="@+id/divider_line"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:background="#BDBDBD"
+            app:layout_constraintEnd_toEndOf="@id/tv_duration"
+            app:layout_constraintStart_toStartOf="@id/tv_duration"
+            app:layout_constraintTop_toBottomOf="@id/tv_duration" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bay thẳng"
+            android:textColor="#757575"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="@id/tv_duration"
+            app:layout_constraintStart_toStartOf="@id/tv_duration"
+            app:layout_constraintTop_toBottomOf="@id/divider_line" />
+
+        <TextView
+            android:id="@+id/tv_arr_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="01:35"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/tv_price"
+            app:layout_constraintStart_toEndOf="@id/tv_duration"
+            app:layout_constraintTop_toTopOf="@id/tv_dep_time" />
+
+        <TextView
+            android:id="@+id/tv_arr_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HAN"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/tv_arr_time"
+            app:layout_constraintStart_toStartOf="@id/tv_arr_time"
+            app:layout_constraintTop_toBottomOf="@id/tv_arr_time" />
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="1.287.000đ"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tv_arr_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_arr_time" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1 hành khách"
+            android:textColor="#757575"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="@id/tv_price"
+            app:layout_constraintTop_toBottomOf="@id/tv_price" />
+
+        <TextView
+            android:id="@+id/tv_airline_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Bamboo Airways"
+            android:textColor="#424242"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/img_airline_logo"
+            app:layout_constraintTop_toBottomOf="@id/img_airline_logo" />
+
+        <TextView
+            android:id="@+id/tv_class_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Economy Saver Max"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/tv_airline_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_airline_name" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiết"
+            android:textColor="#E91E63"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tv_class_name"
+            app:layout_constraintEnd_toEndOf="@id/tv_price" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

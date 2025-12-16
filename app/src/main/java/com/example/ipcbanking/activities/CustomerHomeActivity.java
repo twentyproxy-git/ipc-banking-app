@@ -56,7 +56,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
     private CardView cardAvatarHeader, btnLogout;
     private View badgeKycAlert;
 
-    private View btnTransfer, btnPayBill, btnFlight, btnTicket, btnDeposit, btnWithdraw, btnVerifyKyc;
+    private View btnTransfer, btnPayBill, btnFlight, btnTicket, btnDeposit, btnWithdraw, btnVerifyKyc, btnTopUp; // Added btnTopUp
 
     // Accounts
     private RecyclerView rvAccountsCarousel;
@@ -130,6 +130,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
         btnDeposit = findViewById(R.id.btn_deposit);
         btnWithdraw = findViewById(R.id.btn_withdraw);
         btnVerifyKyc = findViewById(R.id.btn_verify_kyc);
+        btnTopUp = findViewById(R.id.btn_top_up);
     }
 
     private void setupRecyclerViewWithSnap() {
@@ -204,13 +205,11 @@ public class CustomerHomeActivity extends AppCompatActivity {
             user.reauthenticate(credential)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Verified Successfully", Toast.LENGTH_SHORT).show();
-                        // Mở khóa adapter
                         accountAdapter.setVisibilityState(true);
-                        dialog.dismiss(); // Đóng dialog
+                        dialog.dismiss();
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(this, "Incorrect Password!", Toast.LENGTH_SHORT).show();
-                        // Không đóng dialog để user nhập lại
                     });
         }
     }
@@ -276,26 +275,19 @@ public class CustomerHomeActivity extends AppCompatActivity {
         cardAvatarHeader.setOnClickListener(v -> openProfileActivity());
 
         btnTransfer.setOnClickListener(v -> {
-//            if (currentSelectedAccount != null) {
-//                Intent intent = new Intent(CustomerHomeActivity.this, TransferActivity.class);
-//                intent.putExtra("SOURCE_ACCOUNT", currentSelectedAccount);
-//                startActivity(intent);
-//            } else {
-//                Toast.makeText(this, "Please select an account first", Toast.LENGTH_SHORT).show();
-//            }
+            if (currentSelectedAccount != null) {
+                Intent intent = new Intent(CustomerHomeActivity.this, TransferActivity.class);
+                intent.putExtra("SOURCE_ACCOUNT", currentSelectedAccount);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Please select an account first", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        btnPayBill.setOnClickListener(v ->
-                Toast.makeText(this, "Pay Bill feature coming soon!", Toast.LENGTH_SHORT).show()
-        );
-
-        btnFlight.setOnClickListener(v ->
-                Toast.makeText(this, "Flight Booking feature coming soon!", Toast.LENGTH_SHORT).show()
-        );
-
-        btnTicket.setOnClickListener(v ->
-                Toast.makeText(this, "Ticket Booking feature coming soon!", Toast.LENGTH_SHORT).show()
-        );
+        btnPayBill.setOnClickListener(v -> openUtilityPayment("Pay Bill"));
+        btnTopUp.setOnClickListener(v -> startActivity(new Intent(CustomerHomeActivity.this, TopUpActivity.class)));
+        btnTicket.setOnClickListener(v -> startActivity(new Intent(CustomerHomeActivity.this, MovieSearchActivity.class)));
+        btnFlight.setOnClickListener(v -> startActivity(new Intent(CustomerHomeActivity.this, FlightSearchActivity.class)));
 
         btnDeposit.setOnClickListener(v -> {
             Intent intent = new Intent(CustomerHomeActivity.this, DepositActivity.class);
@@ -323,6 +315,12 @@ public class CustomerHomeActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private void openUtilityPayment(String utilityType) {
+        Intent intent = new Intent(CustomerHomeActivity.this, UtilityPaymentActivity.class);
+        intent.putExtra(UtilityPaymentActivity.EXTRA_UTILITY_TYPE, utilityType);
+        startActivity(intent);
     }
 
     private void openProfileActivity() {

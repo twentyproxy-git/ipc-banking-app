@@ -51,17 +51,18 @@ public class LoginActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("AppConfig", MODE_PRIVATE);
 
-        boolean isSeeded = prefs.getBoolean("is_data_seeded_v2", false);
+        // Change the key to force re-seeding for movie data
+        boolean isSeeded = prefs.getBoolean("is_data_seeded_v9", false);
 
         if (!isSeeded) {
-            Log.d("FirebaseSeeder", "🌱 First run (v2) detected. Seeding data...");
+            Log.d("FirebaseSeeder", "🌱 First run (v9) detected. Seeding data...");
             Toast.makeText(this, "Initializing sample data...", Toast.LENGTH_SHORT).show();
 
             firebaseSeeder.seedUsers();
 
-            // Lưu lại trạng thái đã seed
+            // Save the new state
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("is_data_seeded_v2", true);
+            editor.putBoolean("is_data_seeded_v9", true);
             editor.apply();
         } else {
             Log.d("FirebaseSeeder", "✅ Data already seeded. Skipping to protect data.");

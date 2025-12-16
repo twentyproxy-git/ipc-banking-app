@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="280dp" 
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/bg_card_selected" 
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/tv_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FF5722"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="Duy nhất 15.12 | giảm đến 100k"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_class_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Economy Saver Max"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/img_radio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_badge" />
+
+    <ImageView
+        android:id="@+id/img_radio"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:src="@android:drawable/btn_radio"
+        app:tint="#E91E63"
+        app:layout_constraintBottom_toBottomOf="@id/tv_class_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_class_title" />
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Đang chọn"
+        android:textColor="#E91E63"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/tv_class_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_class_title" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_class_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_status">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="7kg Hành lý xách tay"
+            android:textColor="#616161"
+            app:drawableStartCompat="@android:drawable/checkbox_on_background"
+            app:drawableTint="#4CAF50"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Hành lý ký gửi"
+            android:textColor="#616161"
+            app:drawableStartCompat="@android:drawable/ic_menu_help"
+            app:drawableTint="#FFC107"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Hoàn vé"
+            android:textColor="#616161"
+            app:drawableStartCompat="@android:drawable/ic_delete"
+            app:drawableTint="#757575"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:text="Thay đổi vé"
+            android:textColor="#616161"
+            app:drawableStartCompat="@android:drawable/ic_menu_help"
+            app:drawableTint="#FFC107"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

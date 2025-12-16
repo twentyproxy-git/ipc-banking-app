@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_cinema_name_showtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CGV Aeon Bình Tân"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_format_showtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2D Phụ đề" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:columnCount="4">
+
+        <TextView
+            android:id="@+id/tv_time_showtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#E0E0E0"
+            android:padding="8dp"
+            android:text="08:30" />
+
+        <TextView
+            android:id="@+id/tv_availability_showtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Còn 145/146" />
+
+    </GridLayout>
+</LinearLayout>

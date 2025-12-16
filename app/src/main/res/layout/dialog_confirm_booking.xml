@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xác nhận đặt vé"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_dialog_movie_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Lửa và Tro Tàn" />
+
+    <TextView
+        android:id="@+id/tv_cinema_name_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@android:drawable/ic_menu_camera"
+        android:drawablePadding="8dp"
+        android:text="CGV Aeon Bình Tân" />
+
+    <TextView
+        android:id="@+id/tv_showtime_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@android:drawable/ic_menu_recent_history"
+        android:drawablePadding="8dp"
+        android:text="08:30~12:07" />
+
+    <TextView
+        android:id="@+id/tv_date_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@android:drawable/ic_menu_my_calendar"
+        android:drawablePadding="8dp"
+        android:text="Thứ 5, 18/12/2025" />
+
+    <Button
+        android:id="@+id/btn_confirm_purchase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Xác nhận" />
+
+</LinearLayout>

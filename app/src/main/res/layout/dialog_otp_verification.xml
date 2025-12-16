@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/border_screen">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter OTP"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="An OTP has been sent to your registered phone number."
+        android:textSize="14sp"
+        android:textColor="#555555"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center"
+        android:textAlignment="center"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/et_otp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:hint="6-Digit OTP"
+        android:inputType="number"
+        android:maxLength="6"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:letterSpacing="0.3"/>
+
+    <Button
+        android:id="@+id/btn_confirm_otp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Verify &amp; Proceed"
+        android:backgroundTint="#4d485c"/>
+
+    <Button
+        android:id="@+id/btn_cancel_otp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:text="Cancel"
+        android:textColor="#701715"/>
+</LinearLayout>

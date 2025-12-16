@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/iv_cinema_logo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_unknown" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp">
+
+        <TextView
+            android:id="@+id/tv_cinema_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CGV Aeon Bình Tân"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_cinema_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quận Bình Tân • -km" />
+
+        <TextView
+            android:id="@+id/tv_cinema_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tầng 3, Trung tâm thương mại Aeon..." />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_favorite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_myplaces" 
+        android:layout_marginEnd="16dp"/>
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_chevron_right" />
+
+</LinearLayout>

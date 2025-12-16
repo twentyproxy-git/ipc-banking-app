@@ -1,8 +1,12 @@
 package com.example.ipcbanking.activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -14,14 +18,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
-import com.example.ipcbanking.models.TransactionItem;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,15 +40,17 @@ import com.google.firebase.firestore.FieldValue;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Executor;
 
 public class DepositActivity extends AppCompatActivity {
+
+    private static final long HIGH_VALUE_TRANSACTION_THRESHOLD = 10000000;
 
     private ImageView btnBack;
     private TextView tvAccountNumber, tvAccountBalance;
@@ -57,9 +66,12 @@ public class DepositActivity extends AppCompatActivity {
     private List<AccountItem> accountList = new ArrayList<>();
     private AccountItem currentAccount;
     private String selectedSource = "System";
-    private String fullName = "Me";  // fallback nếu chưa fetch xong
+    private String fullName = "Me";
     private FirebaseUser firebaseUser;
 
+    private Executor executor;
+    private BiometricPrompt biometricPrompt;
+    private BiometricPrompt.PromptInfo promptInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +110,7 @@ public class DepositActivity extends AppCompatActivity {
         setupListeners();
         setupMoneyFormatter(etAmount);
         loadUserAccounts();
+        setupBiometricPrompt();
     }
 
     private void initViews() {
@@ -203,7 +216,7 @@ public class DepositActivity extends AppCompatActivity {
             return;
         }
 
-        String rawAmount = etAmount.getText().toString().replace(".", "");
+        String rawAmount = Objects.requireNonNull(etAmount.getText()).toString().replace(".", "");
 
         if (rawAmount.isEmpty()) {
             etAmount.setError("Please enter amount");
@@ -217,6 +230,87 @@ public class DepositActivity extends AppCompatActivity {
             return;
         }
 
+        if (amount >= HIGH_VALUE_TRANSACTION_THRESHOLD) {
+            biometricPrompt.authenticate(promptInfo);
+        } else {
+            showOtpDialog(amount);
+        }
+    }
+
+    private void setupBiometricPrompt() {
+        executor = ContextCompat.getMainExecutor(this);
+        biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                long amount = Long.parseLong(Objects.requireNonNull(etAmount.getText()).toString().replace(".", ""));
+                showOtpDialog(amount);
+            }
+
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.ERROR_USER_CANCELED) {
+                    Toast.makeText(getApplicationContext(), "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric Authentication")
+                .setSubtitle("Authenticate to proceed with your transaction")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                .setNegativeButtonText("Cancel")
+                .build();
+    }
+
+    private void showOtpDialog(long amount) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_otp_verification, null);
+        builder.setView(view);
+
+        final AlertDialog dialog = builder.create();
+
+        EditText etOtp = view.findViewById(R.id.et_otp);
+        Button btnConfirmOtp = view.findViewById(R.id.btn_confirm_otp);
+        Button btnCancelOtp = view.findViewById(R.id.btn_cancel_otp);
+
+        btnConfirmOtp.setOnClickListener(v -> {
+            String otp = etOtp.getText().toString();
+            if (otp.equals("123456")) { // Hardcoded OTP for demonstration
+                dialog.dismiss();
+                simulatePaymentGateway(amount);
+            } else {
+                Toast.makeText(this, "Invalid OTP", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnCancelOtp.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void simulatePaymentGateway(long amount) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_payment_simulation, null);
+        builder.setView(view);
+        builder.setCancelable(false);
+        final AlertDialog simulationDialog = builder.create();
+        simulationDialog.show();
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            simulationDialog.dismiss();
+            executeDepositTransaction(amount);
+        }, 3000); // Simulate a 3-second delay
+    }
+
+    private void executeDepositTransaction(long amount) {
         loadingOverlay.setVisibility(View.VISIBLE);
 
         DocumentReference accRef = db.collection("accounts").document(currentAccount.getId());
@@ -224,14 +318,15 @@ public class DepositActivity extends AppCompatActivity {
         db.runTransaction(transaction -> {
             DocumentSnapshot snapshot = transaction.get(accRef);
 
-            double currentBalance = snapshot.getDouble("balance");
+            Double currentBalance = snapshot.getDouble("balance");
+            if (currentBalance == null) currentBalance = 0.0;
             double newBalance = currentBalance + amount;
 
             transaction.update(accRef, "balance", newBalance);
 
             return newBalance;
         }).addOnSuccessListener(newBalance -> {
-            currentAccount.setBalance(newBalance);
+            currentAccount.setBalance((Double) newBalance);
             updateAccountInfoUI();
             saveTransactionHistory(amount);
         }).addOnFailureListener(e -> {
@@ -243,7 +338,6 @@ public class DepositActivity extends AppCompatActivity {
     private void saveTransactionHistory(double amount) {
         Map<String, Object> transactionData = new HashMap<>();
 
-        // Chuẩn hoá tên ngân hàng
         String bankName;
         if (selectedSource.contains("MOMO")) {
             bankName = "MoMo";
@@ -252,18 +346,11 @@ public class DepositActivity extends AppCompatActivity {
         }
 
         transactionData.put("type", "DEPOSIT");
-
-        // BÊN GỬI: EXTERNAL
         transactionData.put("sender_account", "EXTERNAL");
         transactionData.put("sender_name", fullName + " (" + bankName + ")");
-
-        // BÊN NHẬN: USER
         transactionData.put("receiver_account", currentAccount.getAccountNumber());
         transactionData.put("receiver_name", fullName);
-
-        // CHỈ GIỮ counterparty_bank
         transactionData.put("counterparty_bank", bankName);
-
         transactionData.put("amount", amount);
         transactionData.put("message", "Deposit via " + bankName);
         transactionData.put("status", "SUCCESS");
