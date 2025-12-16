@@ -1,6 +1,9 @@
 package com.example.ipcbanking.activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +15,8 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
@@ -23,6 +28,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
+import com.example.ipcbanking.utils.NotificationHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -65,6 +71,13 @@ public class TopUpActivity extends AppCompatActivity {
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
 
+    private NotificationHelper notificationHelper;
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // Handle permission grant/denial if needed
+            });
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +92,7 @@ public class TopUpActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         customerId = Objects.requireNonNull(firebaseUser).getUid();
+        notificationHelper = new NotificationHelper(this);
 
         initViews();
         setupToolbar();
@@ -87,6 +101,15 @@ public class TopUpActivity extends AppCompatActivity {
         setupBiometricPrompt();
         setupProviderSpinner();
         setupDenominationListeners();
+        requestNotificationPermission();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void initViews() {
@@ -222,6 +245,7 @@ public class TopUpActivity extends AppCompatActivity {
     }
 
     private void showOtpDialog(double amount) {
+        notificationHelper.sendOtpNotification("123456");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_otp_verification, null);
         builder.setView(view);

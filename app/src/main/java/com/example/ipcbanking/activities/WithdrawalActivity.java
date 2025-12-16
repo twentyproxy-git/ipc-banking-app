@@ -1,6 +1,9 @@
 package com.example.ipcbanking.activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
@@ -29,6 +34,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
+import com.example.ipcbanking.utils.NotificationHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,6 +43,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -73,6 +80,12 @@ public class WithdrawalActivity extends AppCompatActivity {
     private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
+    private NotificationHelper notificationHelper;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // Handle permission grant/denial if needed
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +101,7 @@ public class WithdrawalActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        notificationHelper = new NotificationHelper(this);
 
         if (firebaseUser != null) {
             db.collection("users")
@@ -118,6 +132,15 @@ public class WithdrawalActivity extends AppCompatActivity {
         loadUserAccounts();
         setupMoneyFormatter(etAmount);
         setupBiometricPrompt();
+        requestNotificationPermission();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void initViews() {
@@ -275,6 +298,7 @@ public class WithdrawalActivity extends AppCompatActivity {
     }
 
     private void showOtpDialog(double amount) {
+        notificationHelper.sendOtpNotification("123456");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_otp_verification, null);
         builder.setView(view);
@@ -316,44 +340,14 @@ public class WithdrawalActivity extends AppCompatActivity {
 
     private void executeWithdrawTransaction(double amount) {
         loadingOverlay.setVisibility(View.VISIBLE);
-        final DocumentReference accountRef = db.collection("accounts").document(currentAccount.getId());
+        WriteBatch batch = db.batch();
 
-        db.runTransaction(transaction -> {
-            DocumentSnapshot snapshot = transaction.get(accountRef);
-            Double currentBalance = snapshot.getDouble("balance");
-            if (currentBalance == null) currentBalance = 0.0;
+        DocumentReference accountRef = db.collection("accounts").document(currentAccount.getId());
+        batch.update(accountRef, "balance", FieldValue.increment(-amount));
 
-            if (currentBalance < amount) {
-                throw new com.google.firebase.firestore.FirebaseFirestoreException(
-                        "Insufficient funds",
-                        com.google.firebase.firestore.FirebaseFirestoreException.Code.ABORTED
-                );
-            }
-
-            double newBalance = currentBalance - amount;
-            transaction.update(accountRef, "balance", newBalance);
-            return newBalance;
-        }).addOnSuccessListener(newBalance -> {
-            currentAccount.setBalance((Double) newBalance);
-            updateAccountInfoUI();
-            saveTransactionHistory(amount);
-        }).addOnFailureListener(e -> {
-            loadingOverlay.setVisibility(View.GONE);
-            Toast.makeText(this, "Withdraw Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void saveTransactionHistory(double amount) {
+        DocumentReference transactionRef = db.collection("transactions").document();
         Map<String, Object> transactionData = new HashMap<>();
-
-        String bankName;
-        if (selectedDestination.equalsIgnoreCase("MOMO Wallet")) {
-            bankName = "MoMo";
-        } else if (selectedDestination.equalsIgnoreCase("MB Bank")) {
-            bankName = "MB Bank";
-        } else {
-            bankName = "Vietcombank";
-        }
+        String bankName = selectedDestination.equalsIgnoreCase("MOMO Wallet") ? "MoMo" : selectedDestination;
 
         transactionData.put("type", "WITHDRAW");
         transactionData.put("sender_account", currentAccount.getAccountNumber());
@@ -365,18 +359,19 @@ public class WithdrawalActivity extends AppCompatActivity {
         transactionData.put("message", "Withdraw to " + bankName);
         transactionData.put("status", "SUCCESS");
         transactionData.put("created_at", FieldValue.serverTimestamp());
+        batch.set(transactionRef, transactionData);
 
-        db.collection("transactions")
-                .add(transactionData)
-                .addOnSuccessListener(doc -> {
-                    loadingOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "Withdraw successful!", Toast.LENGTH_SHORT).show();
-                    etAmount.setText("");
-                })
-                .addOnFailureListener(e -> {
-                    loadingOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "Withdraw success but history save failed!", Toast.LENGTH_SHORT).show();
-                });
+        batch.commit().addOnSuccessListener(aVoid -> {
+            loadingOverlay.setVisibility(View.GONE);
+            Toast.makeText(this, "Withdraw successful!", Toast.LENGTH_SHORT).show();
+            etAmount.setText("");
+            // Update UI
+            currentAccount.setBalance(currentAccount.getBalance() - amount);
+            updateAccountInfoUI();
+        }).addOnFailureListener(e -> {
+            loadingOverlay.setVisibility(View.GONE);
+            Toast.makeText(this, "Withdraw Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void setupMoneyFormatter(EditText editText) {

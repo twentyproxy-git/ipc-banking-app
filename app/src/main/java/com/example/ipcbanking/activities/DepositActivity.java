@@ -1,6 +1,9 @@
 package com.example.ipcbanking.activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
@@ -29,6 +34,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
+import com.example.ipcbanking.utils.NotificationHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,6 +43,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -72,6 +79,12 @@ public class DepositActivity extends AppCompatActivity {
     private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
+    private NotificationHelper notificationHelper;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // Handle permission grant/denial if needed
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +100,7 @@ public class DepositActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        notificationHelper = new NotificationHelper(this);
 
         if (firebaseUser != null) {
             db.collection("users")
@@ -111,6 +125,15 @@ public class DepositActivity extends AppCompatActivity {
         setupMoneyFormatter(etAmount);
         loadUserAccounts();
         setupBiometricPrompt();
+        requestNotificationPermission();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void initViews() {
@@ -271,6 +294,7 @@ public class DepositActivity extends AppCompatActivity {
     }
 
     private void showOtpDialog(long amount) {
+        notificationHelper.sendOtpNotification("123456");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_otp_verification, null);
         builder.setView(view);
@@ -313,37 +337,14 @@ public class DepositActivity extends AppCompatActivity {
     private void executeDepositTransaction(long amount) {
         loadingOverlay.setVisibility(View.VISIBLE);
 
+        WriteBatch batch = db.batch();
+
         DocumentReference accRef = db.collection("accounts").document(currentAccount.getId());
+        batch.update(accRef, "balance", FieldValue.increment(amount));
 
-        db.runTransaction(transaction -> {
-            DocumentSnapshot snapshot = transaction.get(accRef);
-
-            Double currentBalance = snapshot.getDouble("balance");
-            if (currentBalance == null) currentBalance = 0.0;
-            double newBalance = currentBalance + amount;
-
-            transaction.update(accRef, "balance", newBalance);
-
-            return newBalance;
-        }).addOnSuccessListener(newBalance -> {
-            currentAccount.setBalance((Double) newBalance);
-            updateAccountInfoUI();
-            saveTransactionHistory(amount);
-        }).addOnFailureListener(e -> {
-            loadingOverlay.setVisibility(View.GONE);
-            Toast.makeText(this, "Deposit Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void saveTransactionHistory(double amount) {
+        DocumentReference transactionRef = db.collection("transactions").document();
         Map<String, Object> transactionData = new HashMap<>();
-
-        String bankName;
-        if (selectedSource.contains("MOMO")) {
-            bankName = "MoMo";
-        } else {
-            bankName = selectedSource;
-        }
+        String bankName = selectedSource.contains("MOMO") ? "MoMo" : selectedSource;
 
         transactionData.put("type", "DEPOSIT");
         transactionData.put("sender_account", "EXTERNAL");
@@ -351,24 +352,26 @@ public class DepositActivity extends AppCompatActivity {
         transactionData.put("receiver_account", currentAccount.getAccountNumber());
         transactionData.put("receiver_name", fullName);
         transactionData.put("counterparty_bank", bankName);
-        transactionData.put("amount", amount);
+        transactionData.put("amount", (double) amount);
         transactionData.put("message", "Deposit via " + bankName);
         transactionData.put("status", "SUCCESS");
         transactionData.put("created_at", FieldValue.serverTimestamp());
 
-        db.collection("transactions")
-                .add(transactionData)
-                .addOnSuccessListener(doc -> {
-                    loadingOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "Deposit successful!", Toast.LENGTH_SHORT).show();
-                    etAmount.setText("");
-                })
-                .addOnFailureListener(e -> {
-                    loadingOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "Deposit saved partially!", Toast.LENGTH_SHORT).show();
-                });
-    }
+        batch.set(transactionRef, transactionData);
 
+        batch.commit().addOnSuccessListener(aVoid -> {
+            loadingOverlay.setVisibility(View.GONE);
+            Toast.makeText(this, "Deposit successful!", Toast.LENGTH_SHORT).show();
+            
+            currentAccount.setBalance(currentAccount.getBalance() + amount);
+            updateAccountInfoUI();
+            etAmount.setText("");
+
+        }).addOnFailureListener(e -> {
+            loadingOverlay.setVisibility(View.GONE);
+            Toast.makeText(this, "Deposit Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
+    }
 
     private void setupMoneyFormatter(EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {

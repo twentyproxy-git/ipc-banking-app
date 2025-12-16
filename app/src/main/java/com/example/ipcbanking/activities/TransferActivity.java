@@ -1,6 +1,9 @@
 package com.example.ipcbanking.activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
@@ -28,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.AccountItem;
+import com.example.ipcbanking.utils.NotificationHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,6 +82,12 @@ public class TransferActivity extends AppCompatActivity {
     private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
+    private NotificationHelper notificationHelper;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher = 
+        registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            // You can optionally show a toast or log if permission is granted/denied
+        });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +104,8 @@ public class TransferActivity extends AppCompatActivity {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         customerId = Objects.requireNonNull(firebaseUser).getUid();
 
+        notificationHelper = new NotificationHelper(this);
+
         initViews();
         setupListeners();
         loadSourceAccounts();
@@ -99,6 +113,15 @@ public class TransferActivity extends AppCompatActivity {
         setupBiometricPrompt();
         setupDestinationAccountTextWatcher();
         setupMoneyFormatter(etAmount);
+        requestNotificationPermission();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API 33
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void initViews() {
@@ -318,6 +341,7 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     private void showOtpDialog(double amount) {
+        notificationHelper.sendOtpNotification("123456");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_otp_verification, null);
         builder.setView(view);
