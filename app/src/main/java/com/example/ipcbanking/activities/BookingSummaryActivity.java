@@ -32,6 +32,7 @@ import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.Movie;
 import com.example.ipcbanking.models.Showtime;
 import com.example.ipcbanking.utils.NotificationHelper;
+import com.example.ipcbanking.utils.QRCodeHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -73,6 +74,7 @@ public class BookingSummaryActivity extends AppCompatActivity {
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
     private NotificationHelper notificationHelper;
+    private QRCodeHelper qrCodeHelper;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -98,6 +100,7 @@ public class BookingSummaryActivity extends AppCompatActivity {
         selectedSeats = getIntent().getStringArrayListExtra("SELECTED_SEATS");
 
         notificationHelper = new NotificationHelper(this);
+        qrCodeHelper = new QRCodeHelper(this);
 
         initViews();
 
@@ -114,13 +117,17 @@ public class BookingSummaryActivity extends AppCompatActivity {
         });
 
         setupBiometricPrompt();
-        requestNotificationPermission();
+        requestFilePermissions();
     }
 
-    private void requestNotificationPermission() {
+    private void requestFilePermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
         }
     }
@@ -251,6 +258,7 @@ public class BookingSummaryActivity extends AppCompatActivity {
 
         String userId = currentUser.getUid();
         DocumentReference accountRef = db.collection("accounts").document(userId + "_CHECKING");
+        DocumentReference bookingRef = db.collection("movie_bookings").document();
 
         db.runTransaction(transaction -> {
             DocumentSnapshot userSnapshot = transaction.get(db.collection("users").document(userId));
@@ -266,8 +274,8 @@ public class BookingSummaryActivity extends AppCompatActivity {
 
             transaction.update(accountRef, "balance", currentBalance - totalPrice);
 
-            DocumentReference bookingRef = db.collection("movie_bookings").document();
             Map<String, Object> bookingData = new HashMap<>();
+            bookingData.put("bookingId", bookingRef.getId());
             bookingData.put("userId", userId);
             bookingData.put("showtimeId", showtimeId);
             bookingData.put("movieId", mCurrentMovie.getMovieId());
@@ -289,11 +297,26 @@ public class BookingSummaryActivity extends AppCompatActivity {
             txData.put("sender_name", senderName);
             txData.put("receiver_name", mCurrentShowtime.getCinemaName());
             txData.put("counterparty_bank", "Cinema");
+            txData.put("bookingId", bookingRef.getId());
             transaction.set(transactionRef, txData);
 
             return null;
         }).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Booking Confirmed!", Toast.LENGTH_SHORT).show();
+
+            String jsonContent = qrCodeHelper.createMovieBookingJson(
+                    bookingRef.getId(),
+                    userId,
+                    mCurrentMovie.getTitle(),
+                    mCurrentShowtime.getCinemaName(),
+                    showtimeSummary.getText().toString(),
+                    String.join(", ", selectedSeats)
+            );
+            if (jsonContent != null) {
+                android.graphics.Bitmap qrBitmap = qrCodeHelper.generateQRCode(jsonContent);
+                qrCodeHelper.saveQRCodeToGallery(qrBitmap, "IPC_Movie_", bookingRef.getId());
+            }
+
             Intent intent = new Intent(BookingSummaryActivity.this, MovieSearchActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

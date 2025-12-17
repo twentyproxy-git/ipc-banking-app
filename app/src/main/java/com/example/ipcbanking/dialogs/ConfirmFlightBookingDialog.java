@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment;
 import com.example.ipcbanking.R;
 import com.example.ipcbanking.models.Flight;
 import com.example.ipcbanking.utils.NotificationHelper;
+import com.example.ipcbanking.utils.QRCodeHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -56,6 +57,7 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private NotificationHelper notificationHelper;
+    private QRCodeHelper qrCodeHelper;
     private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
@@ -80,6 +82,7 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         notificationHelper = new NotificationHelper(requireContext());
+        qrCodeHelper = new QRCodeHelper(requireContext());
 
         if (getArguments() != null) {
             flight = (Flight) getArguments().getSerializable("flight");
@@ -90,7 +93,19 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
         }
 
         setupBiometricPrompt();
-        requestNotificationPermission();
+        requestFilePermissions();
+    }
+
+    private void requestFilePermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+        }
     }
 
     @Nullable
@@ -103,14 +118,6 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
         btnCancel.setOnClickListener(v -> dismiss());
         btnConfirm.setOnClickListener(v -> processBooking());
         return view;
-    }
-
-    private void requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
     }
 
     private void initViews(View view) {
@@ -217,6 +224,7 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
 
         DocumentReference accountRef = db.collection("accounts").document(userId + "_CHECKING");
         DocumentReference flightRef = db.collection("flights").document(flight.getFlightId());
+        DocumentReference bookingRef = db.collection("flight_bookings").document(); // Generate a new booking ID
 
         db.runTransaction(transaction -> {
             DocumentSnapshot userSnapshot = transaction.get(db.collection("users").document(userId));
@@ -238,8 +246,8 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
             transaction.update(accountRef, "balance", currentBalance - ticketPrice);
             transaction.update(flightRef, "classes." + flightClassKey + ".availableSeats", FieldValue.increment(-1));
 
-            DocumentReference bookingRef = db.collection("flight_bookings").document();
             Map<String, Object> bookingData = new HashMap<>();
+            bookingData.put("bookingId", bookingRef.getId()); // Store the booking ID
             bookingData.put("userId", userId);
             bookingData.put("flightId", flight.getFlightId());
             bookingData.put("flightNumber", flight.getFlightNumber());
@@ -260,12 +268,33 @@ public class ConfirmFlightBookingDialog extends DialogFragment {
             txData.put("sender_name", senderName);
             txData.put("receiver_name", flight.getAirlineName());
             txData.put("counterparty_bank", flight.getAirlineName());
+            txData.put("bookingId", bookingRef.getId()); // Link to the booking
             transaction.set(transactionRef, txData);
 
-            return null;
-        }).addOnSuccessListener(aVoid -> {
+            return senderName; // Return senderName for QR code generation
+        }).addOnSuccessListener(senderName -> {
             Toast.makeText(getContext(), "Đặt vé thành công!", Toast.LENGTH_LONG).show();
+
+            // --- Generate and Save QR Code ---
+            String jsonContent = qrCodeHelper.createFlightBookingJson(
+                    bookingRef.getId(),
+                    userId,
+                    (String) senderName,
+                    flight.getFlightNumber(),
+                    flight.getAirlineName(),
+                    flight.getDepartureAirport(),
+                    flight.getArrivalAirport(),
+                    flight.getDepartureTime(),
+                    selectedClass.getName()
+            );
+            if (jsonContent != null) {
+                android.graphics.Bitmap qrBitmap = qrCodeHelper.generateQRCode(jsonContent);
+                qrCodeHelper.saveQRCodeToGallery(qrBitmap, "IPC_Flight_", bookingRef.getId());
+            }
+            // --- End QR Code --- 
+
             dismiss();
+
         }).addOnFailureListener(e -> {
             Toast.makeText(getContext(), "Lỗi đặt vé: " + e.getMessage(), Toast.LENGTH_LONG).show();
             btnConfirm.setEnabled(true);
