@@ -2,6 +2,10 @@ package com.example.ipcbanking.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -25,12 +29,14 @@ import java.util.List;
 public class MovieSearchActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    
+    private EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_search);
+
+        editText = findViewById(R.id.et_search);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -45,6 +51,20 @@ public class MovieSearchActivity extends AppCompatActivity {
 
         setupPromotions();
         setupFeaturedMovies();
+
+        //Search by Keyword
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) { }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchMovies(s.toString().trim());
+            }
+        });
 
     }
 
@@ -73,13 +93,40 @@ public class MovieSearchActivity extends AppCompatActivity {
         db.collection("movies").get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                 Movie movie = document.toObject(Movie.class);
+                movie.setMovieId(document.getId());
                 movieList.add(movie);
             }
             movieAdapter.notifyDataSetChanged();
         });
     }
 
-    private void searchMovies(String name) {
+    private void searchMovies(String keyword) {
+        RecyclerView featuredMoviesRecyclerView = findViewById(R.id.rv_featured_movies);
+        MovieAdapter movieAdapter = (MovieAdapter) featuredMoviesRecyclerView.getAdapter();
 
+        if (movieAdapter == null) return;
+
+        List<Movie> resultList = new ArrayList<>();
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            // Nếu không nhập gì → load lại toàn bộ phim
+            setupFeaturedMovies();
+            return;
+        }
+
+        db.collection("movies")
+                .orderBy("title")
+                .startAt(keyword)
+                .endAt(keyword + "\uf8ff")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Movie movie = document.toObject(Movie.class);
+                        movie.setMovieId(document.getId());
+                        resultList.add(movie);
+                    }
+                    movieAdapter.updateData(resultList);
+                });
     }
+
 }

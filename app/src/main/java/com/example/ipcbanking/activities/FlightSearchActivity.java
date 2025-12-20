@@ -185,9 +185,14 @@ public class FlightSearchActivity extends AppCompatActivity {
     }
 
     private void updatePassengerCount(int change) {
-        if (passengerCount + change >= 1) {
+        if (passengerCount + change == 1) {
             passengerCount += change;
-            tvPassengers.setText(passengerCount + " người lớn");
+            tvPassengers.setText(passengerCount + " Passenger");
+        }
+
+        if (passengerCount + change > 1) {
+            passengerCount += change;
+            tvPassengers.setText(passengerCount + " Passengers");
         }
     }
 
@@ -196,8 +201,8 @@ public class FlightSearchActivity extends AppCompatActivity {
         String toStr = actvToCapital.getText().toString();
         String dateStr = tvDepartureDate.getText().toString();
 
-        if (fromStr.isEmpty() || toStr.isEmpty() || dateStr.contains("Chọn")) {
-            Toast.makeText(this, "Vui lòng chọn đầy đủ thông tin.", Toast.LENGTH_SHORT).show();
+        if (fromStr.isEmpty() || toStr.isEmpty() || dateStr.contains("Select")) {
+            Toast.makeText(this, "Please fill full information.", Toast.LENGTH_SHORT).show();
             return;
         }
 

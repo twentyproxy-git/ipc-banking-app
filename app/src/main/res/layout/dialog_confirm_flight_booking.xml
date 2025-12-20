@@ -106,7 +106,7 @@
             android:layout_weight="1"
             android:text="Confirm"
             android:textColor="@android:color/white"
-            app:backgroundTint="#E91E63" />
+            app:backgroundTint="#590303" />
     </LinearLayout>
 
 </LinearLayout>

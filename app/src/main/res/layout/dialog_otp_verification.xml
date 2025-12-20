@@ -1,56 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@drawable/border_screen">
+    android:layout_margin="16dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#FAEEEE">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enter OTP"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/white"
-        android:layout_gravity="center"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="An OTP has been sent to your registered phone number."
-        android:textSize="14sp"
-        android:textColor="#FFF6F8"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"/>
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/et_otp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:hint="6-Digit OTP"
-        android:textColorHint="#FFF0F5"
-        android:inputType="number"
-        android:maxLength="6"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:letterSpacing="0.3"/>
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/btn_confirm_otp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Verify &amp; Proceed"
-        android:backgroundTint="#4d485c"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter OTP"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#590303"
+            android:layout_gravity="center"/>
 
-    <Button
-        android:id="@+id/btn_cancel_otp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:text="Cancel"
-        android:textColor="#701715"/>
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="An OTP has been sent to your registered phone number."
+            android:textSize="14sp"
+            android:textColor="#590303"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"/>
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_otp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:hint="6-Digit OTP"
+            android:inputType="number"
+            android:maxLength="6"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:letterSpacing="0.3"/>
+
+        <Button
+            android:id="@+id/btn_confirm_otp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Verify &amp; Proceed"
+            android:backgroundTint="#590303"/>
+
+        <Button
+            android:id="@+id/btn_cancel_otp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:text="Cancel"
+            android:textColor="#701715"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

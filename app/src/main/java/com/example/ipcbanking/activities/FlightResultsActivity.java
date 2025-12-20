@@ -86,7 +86,7 @@ public class FlightResultsActivity extends AppCompatActivity implements FlightAd
 
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd/MM/yyyy", new Locale("vi", "VN"));
         String dateStr = sdf.format(new Date(dateMillis));
-        tvFlightDatePassenger.setText(String.format("%s • %d hành khách", dateStr, passengers));
+        tvFlightDatePassenger.setText(String.format("%s • %d passenger", dateStr, passengers));
     }
 
     private void fetchAndFilterFlights(String depCode, String arrCode, long searchDateMillis) {
@@ -123,11 +123,11 @@ public class FlightResultsActivity extends AppCompatActivity implements FlightAd
                 }).collect(Collectors.toList()));
 
                 flightAdapter.notifyDataSetChanged();
-                tvFlightCount.setText(String.format("✓ Đã tìm thấy %d chuyến bay", flightList.size()));
+                tvFlightCount.setText(String.format("✓ Found %d flights", flightList.size()));
 
             } else {
                 Log.w(TAG, "Error getting documents.", task.getException());
-                Toast.makeText(this, "Lỗi khi tìm chuyến bay: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error while searching for flights: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

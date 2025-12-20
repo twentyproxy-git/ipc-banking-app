@@ -53,4 +53,9 @@ public class Movie {
     public String getSynopsis() {
         return synopsis;
     }
+
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
+    }
+
 }
