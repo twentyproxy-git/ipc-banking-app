@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_back_arrow"
-            app:title="Avatar: Lửa và Tro Tàn" />
+            app:title="Avatar: Fire and Ash" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,11 +35,11 @@
             android:padding="8dp">
 
             <!-- Sample Date and Time Buttons -->
-            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="16/12\nThứ 3" />
-            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="17/12\nThứ 4" />
-            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="18/12\nThứ 5" />
-            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="19/12\nThứ 6" />
-            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20/12\nThứ 7" />
+            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="16/12\nTuesday" />
+            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="17/12\nWednesday" />
+            <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="18/12\nThursday" />
+            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="19/12\nFriday" />
+            <Button style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20/12\nSaturday" />
         </LinearLayout>
     </HorizontalScrollView>
 

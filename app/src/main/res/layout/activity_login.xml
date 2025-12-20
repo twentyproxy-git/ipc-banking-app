@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="IPC Banking"
-        android:textColor="#400102"
+        android:textColor="#F2D6D7"
         android:textSize="32sp"
         android:textStyle="bold"
         android:padding="16dp"

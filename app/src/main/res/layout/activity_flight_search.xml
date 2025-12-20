@@ -11,6 +11,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#590303"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -18,7 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_back_arrow"
-            app:title="Tìm chuyến bay" />
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white"
+            app:title="Find flights" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,7 +54,7 @@
                         android:id="@+id/tv_from_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Điểm đi"
+                        android:text="Departure"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -63,7 +66,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:hint="Quốc gia"
+                        android:hint="Country"
                         app:layout_constraintEnd_toStartOf="@id/fab_swap"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_from_label">
@@ -83,7 +86,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:hint="Thành phố"
+                        android:hint="City"
                         app:layout_constraintEnd_toStartOf="@id/fab_swap"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/layout_from_country">
@@ -113,7 +116,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="Điểm đến"
+                        android:text="Destination"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider_flight" />
@@ -125,7 +128,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:hint="Quốc gia"
+                        android:hint="Country"
                         app:layout_constraintEnd_toStartOf="@id/fab_swap"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_to_label">
@@ -145,7 +148,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:hint="Thành phố"
+                        android:hint="City"
                         app:layout_constraintEnd_toStartOf="@id/fab_swap"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/layout_to_country">
@@ -198,14 +201,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ngày đi"
+                            android:text="Departure Date"
                             android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tv_departure_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T2, 15/12/2025"
+                            android:text="Mon, 15/12/2025"
                             android:textColor="@android:color/black"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -224,14 +227,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ngày về"
+                            android:text="Return Date"
                             android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tv_return_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chọn ngày về"
+                            android:text="Select return date"
                             android:textColor="@android:color/black"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -241,7 +244,7 @@
                         android:id="@+id/switch_round_trip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Khứ hồi" />
+                        android:text="Round trip" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -263,7 +266,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hành khách"
+                        android:text="Passenger"
                         android:textSize="12sp" />
 
                     <LinearLayout
@@ -276,7 +279,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="1 người lớn"
+                            android:text="1 Adult"
                             android:textColor="@android:color/black"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -308,8 +311,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:padding="16dp"
-                android:backgroundTint="#E91E63"
-                android:text="Tìm chuyến bay"
+                android:backgroundTint="#590303"
+                android:text="Find Flight"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

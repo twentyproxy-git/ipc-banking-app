@@ -13,6 +13,7 @@
         android:background="@android:color/white"
         android:orientation="horizontal"
         android:padding="16dp"
+        android:backgroundTint="#590303"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -22,16 +23,16 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"
             android:src="@android:drawable/ic_menu_revert"
-            app:tint="#590303" />
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:text="Chuyến đi"
-            android:textSize="18sp"
-            android:textColor="#424242"/>
+            android:textColor="@color/white"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/tv_header_price"
@@ -40,7 +41,7 @@
             tools:text="1.287.000đ"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -212,7 +213,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tiếp tục"
-            android:backgroundTint="#E91E63"
+            android:backgroundTint="#590303"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="16sp"

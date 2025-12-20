@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/bg_universe" 
+                android:src="@drawable/bg_universe"
                 android:alpha="0.5"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -53,13 +53,13 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@android:drawable/ic_menu_search"
                 android:drawablePadding="8dp"
-                android:hint="Tìm tên phim hoặc rạp" />
+                android:hint="Searching" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Phim nổi bật"
+                android:text="Featured Movies"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

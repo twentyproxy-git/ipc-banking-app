@@ -17,8 +17,11 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="#590303"
+            app:title="CGV Aeon Bình Tân"
+            app:titleTextColor="@android:color/white"
             app:navigationIcon="@drawable/ic_back_arrow"
-            app:title="CGV Aeon Bình Tân" />
+            app:navigationIconTint="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -29,7 +32,7 @@
         android:layout_below="@+id/appbar"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="MÀN HÌNH"
+        android:text="SCREEN"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
 
@@ -60,7 +63,7 @@
             android:id="@+id/tv_movie_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Avatar: Lửa và Tro Tàn | 08:30~12:07 | Thứ 5, 18/12/2025 | 2D Phụ đề" />
+            android:text="Avatar: Fire and Ash | 08:30~12:07 | Thursday, 18/12/2025 | 2D Subtitled" />
 
 <!--        <TextView-->
 <!--            android:id="@+id/tv_total_price"-->
@@ -73,7 +76,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Tiếp tục" />
+            android:backgroundTint="#590303"
+            android:text="Continue" />
 
     </LinearLayout>
 </RelativeLayout>

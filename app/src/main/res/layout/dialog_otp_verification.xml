@@ -12,7 +12,7 @@
         android:text="Enter OTP"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="#000000"
+        android:textColor="@color/white"
         android:layout_gravity="center"/>
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="An OTP has been sent to your registered phone number."
         android:textSize="14sp"
-        android:textColor="#555555"
+        android:textColor="#FFF6F8"
         android:layout_marginTop="8dp"
         android:layout_gravity="center"
         android:textAlignment="center"/>
@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:hint="6-Digit OTP"
+        android:textColorHint="#FFF0F5"
         android:inputType="number"
         android:maxLength="6"
         android:textAlignment="center"

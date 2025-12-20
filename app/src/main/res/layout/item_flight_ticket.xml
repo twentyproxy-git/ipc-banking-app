@@ -22,7 +22,7 @@
             android:background="#FF5722"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
-            android:text="Duy nhất 15.12 | nhập BAY15 giảm đến 100k"
+            android:text="Only on 15.12 | Enter code BAY15 to get up to 100k off"
             android:textColor="@android:color/white"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -88,7 +88,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bay thẳng"
+            android:text="Direct Flight"
             android:textColor="#757575"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="@id/tv_duration"
@@ -135,7 +135,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1 hành khách"
+            android:text="1 passenger"
             android:textColor="#757575"
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="@id/tv_price"
@@ -166,7 +166,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chi tiết"
+            android:text="Details"
             android:textColor="#E91E63"
             android:textSize="14sp"
             android:textStyle="bold"

@@ -9,7 +9,7 @@
         android:id="@+id/tv_cinema_name_showtime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CGV Aeon Bình Tân"
+        android:text="CGV Aeon Binh Tan"
         android:textColor="@android:color/black"
         android:textStyle="bold" />
 
@@ -17,7 +17,7 @@
         android:id="@+id/tv_format_showtime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2D Phụ đề" />
+        android:text="2D Subtitles" />
 
     <GridLayout
         android:layout_width="match_parent"
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="Còn 145/146" />
+            android:text="Remaining: 145/146" />
 
     </GridLayout>
 </LinearLayout>

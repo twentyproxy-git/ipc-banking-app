@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Xác nhận đặt vé"
+        android:text="Confirm Ticket Booking"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Lửa và Tro Tàn" />
+        android:text="Avatar: Fire and Ash" />
 
     <TextView
         android:id="@+id/tv_cinema_name_confirm"
@@ -26,7 +26,7 @@
         android:layout_marginTop="16dp"
         android:drawableStart="@android:drawable/ic_menu_camera"
         android:drawablePadding="8dp"
-        android:text="CGV Aeon Bình Tân" />
+        android:text="CGV Aeon Binh Tan" />
 
     <TextView
         android:id="@+id/tv_showtime_confirm"
@@ -44,13 +44,13 @@
         android:layout_marginTop="8dp"
         android:drawableStart="@android:drawable/ic_menu_my_calendar"
         android:drawablePadding="8dp"
-        android:text="Thứ 5, 18/12/2025" />
+        android:text="Thursday, 18/12/2025" />
 
     <Button
         android:id="@+id/btn_confirm_purchase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Xác nhận" />
+        android:text="Confirm" />
 
 </LinearLayout>

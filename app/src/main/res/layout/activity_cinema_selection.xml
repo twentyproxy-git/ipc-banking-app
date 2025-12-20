@@ -11,14 +11,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFDDE1">
+        android:background="#590303">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_back_arrow"
-            app:title="Chọn theo rạp" />
+            app:titleTextColor="@color/white"
+            app:title="Select by Cinema" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -27,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:hint="Tìm rạp phim..."
+        android:hint="Find Cinema..."
         android:drawableStart="@android:drawable/ic_menu_search" 
         android:drawablePadding="8dp"/>
 

@@ -14,7 +14,7 @@
         android:background="#FF5722"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4dp"
-        android:text="Duy nhất 15.12 | giảm đến 100k"
+        android:text="One day only 15.12 | Save up to 100k"
         android:textColor="@android:color/white"
         android:textSize="10sp"
         android:textStyle="bold"
@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Đang chọn"
+        android:text="Selected"
         android:textColor="#E91E63"
         android:textStyle="bold"
         android:textSize="14sp"
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:layout_marginBottom="8dp"
-            android:text="7kg Hành lý xách tay"
+            android:text="7kg Carry-on baggage"
             android:textColor="#616161"
             app:drawableStartCompat="@android:drawable/checkbox_on_background"
             app:drawableTint="#4CAF50"/>
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Hành lý ký gửi"
+            android:text="Checked baggage"
             android:textColor="#616161"
             app:drawableStartCompat="@android:drawable/ic_menu_help"
             app:drawableTint="#FFC107"/>
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Hoàn vé"
+            android:text="Refundable Ticket"
             android:textColor="#616161"
             app:drawableStartCompat="@android:drawable/ic_delete"
             app:drawableTint="#757575"/>
@@ -99,7 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
-            android:text="Thay đổi vé"
+            android:text="Ticket change"
             android:textColor="#616161"
             app:drawableStartCompat="@android:drawable/ic_menu_help"
             app:drawableTint="#FFC107"/>

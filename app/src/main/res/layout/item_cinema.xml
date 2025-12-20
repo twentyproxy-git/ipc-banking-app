@@ -23,7 +23,7 @@
             android:id="@+id/tv_cinema_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CGV Aeon Bình Tân"
+            android:text="CGV Aeon Binh Tan"
             android:textColor="@android:color/black"
             android:textStyle="bold" />
 
@@ -31,13 +31,13 @@
             android:id="@+id/tv_cinema_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quận Bình Tân • -km" />
+            android:text="Binh Tan District • -km" />
 
         <TextView
             android:id="@+id/tv_cinema_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tầng 3, Trung tâm thương mại Aeon..." />
+            android:text="Floor 3, AEON Shopping Mall..." />
     </LinearLayout>
 
     <ImageView

@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Xác nhận đặt vé"
+        android:text="Confirm ticket booking"
         android:textColor="@android:color/black"
         android:textSize="22sp"
         android:textStyle="bold" />
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Hồ Chí Minh (SGN) ✈ Hà Nội (HAN)"
+        android:text="Ho Chi Minh City (SGN) ✈ Ha Noi (HAN)"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Bamboo Airways • Thứ hai, 15/12/2025 • 23:25"
+        android:text="Bamboo Airways • Monday, 15/12/2025 • 23:25"
         android:textSize="14sp" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="1 hành khách • Hạng Economy"
+        android:text="1 passenger • Economy"
         android:textSize="14sp" />
 
     <View
@@ -57,7 +57,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tổng thanh toán"
+            android:text="Total"
             android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -79,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_marginTop="4dp"
-        android:text="Số dư tài khoản: 50,000,000đ"
+        android:text="Account Balance: 50,000,000đ"
         android:textSize="12sp" />
 
     <LinearLayout
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Hủy"
+            android:text="Cancel"
             android:textColor="#757575" />
 
         <Button
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="Xác nhận"
+            android:text="Confirm"
             android:textColor="@android:color/white"
             app:backgroundTint="#E91E63" />
     </LinearLayout>

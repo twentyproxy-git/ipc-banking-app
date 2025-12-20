@@ -12,6 +12,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#590303"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -19,6 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_back_arrow"
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white"
             app:title="Transfer Money" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -140,6 +143,8 @@
                 android:id="@+id/btn_confirm_transfer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#590303"
+                android:textColor="@color/white"
                 android:layout_marginTop="24dp"
                 android:text="Confirm Transfer" />
 

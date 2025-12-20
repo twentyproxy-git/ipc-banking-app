@@ -25,6 +25,7 @@ import java.util.List;
 public class MovieSearchActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,5 +77,9 @@ public class MovieSearchActivity extends AppCompatActivity {
             }
             movieAdapter.notifyDataSetChanged();
         });
+    }
+
+    private void searchMovies(String name) {
+
     }
 }
